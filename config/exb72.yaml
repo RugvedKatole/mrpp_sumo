@@ -1,0 +1,15 @@
+use_sim_time: true
+graph: iitb
+priority_nodes: 668685374 -282 5366445083
+time_periods: 160.83263872491995 160.83263872491995 160.83263872491995
+lambda_priority: 50.0
+length_walk: 240
+max_divisions: 10
+eps_prob: 0
+init_bots: 6
+init_locations: ''
+done: false
+sim_length: 30000
+discount_factor: 1
+random_string: exb72
+algo_name: basic

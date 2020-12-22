@@ -1,0 +1,15 @@
+use_sim_time: true
+graph: grid_5_5
+priority_nodes: 4 11 8 23
+time_periods: 60.0 60.0 60.0 60.0
+lambda_priority: 0.0
+length_walk: 40
+max_divisions: 10
+eps_prob: 0
+init_bots: 2
+init_locations: ''
+done: false
+sim_length: 30000
+discount_factor: 1
+random_string: zxv2
+algo_name: v1

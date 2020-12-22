@@ -1,0 +1,15 @@
+use_sim_time: true
+graph: grid_5_5
+priority_nodes: 0 4 20 24
+time_periods: 80.0 80.0 80.0 80.0
+lambda_priority: 10.0
+length_walk: 120
+max_divisions: 40
+eps_prob: 0.1
+init_bots: 1
+init_locations: ''
+done: false
+sim_length: 20000
+discount_factor: 1
+random_string: exp93
+algo_name: basic

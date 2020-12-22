@@ -1,0 +1,15 @@
+use_sim_time: true
+graph: st_line_assym
+priority_nodes: gneJ5 gneJ4
+time_periods: 40.0 40.0
+lambda_priority: 0.0
+length_walk: 40
+max_divisions: 10
+eps_prob: 0
+init_bots: 4
+init_locations: ''
+done: false
+sim_length: 15000
+discount_factor: 1
+random_string: axv21
+algo_name: v1
