@@ -9,8 +9,12 @@ Platform to test MRPP algorithms in SUMO via ROS
 ## Installation
 - Clone into your ros workspace
 - Add the following to your .bashrc script
-export SUMO_HOME=/usr/share/sumo
-export PYTHONPATH=$SUMO_HOME/tools:$PYTHONPATH
+
+      export SUMO_HOME=/usr/share/sumo
+      export PYTHONPATH=$SUMO_HOME/tools:$PYTHONPATH
+    
+
+
 - Enjoy!(?)
 
 ## How to use
