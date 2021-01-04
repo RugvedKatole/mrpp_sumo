@@ -17,6 +17,24 @@ Platform to test MRPP algorithms in SUMO via ROS
 - Enjoy!(?)
 
 ## How to use
+
+### The One Sheet
+![alt text](the_one_sheet.png "Everything You Need!")
+
+### Adding a graph
+- Create a sumo compatible representation for the required environment with [graph_name].net.xml, [graph_name].nod.xml and [graph_name].edg.xml files and add it to the graph_sumo folder.
+- Create a [graph_name].sumocfg file by copying an existing .sumocfg file and replacing the 'net-file' attribute value with [graph_name].net.xml 
+- Create a [graph_name].graphml file by running
+      
+      
+      python3 scripts/sumo_to_graphml.py [graph_name]
+
+  This file stores the graph information in a networkx compatible format.
+  
+### Adding an MRPP algorithm
+
+Will be explained soon. Please be patient :D
+
 ### Pre Process
 - Add a *.yaml file to the /config folder with the required rosparameters (here's a list of required parameters) 
     - graph (name of the graph)

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on Monday 01 June 2020 09:47:08 AM IST by Eclipse SUMO netedit Version 1.6.0
+<!-- generated on Sun 03 Jan 2021 15:38:01 IST by Eclipse SUMO netedit Version 1.8.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="iitb_full.net.xml"/>
+        <sumo-net-file value="/home/sdeepakmallya/ros_ws/src/mrpp_sumo/graph_sumo/iitb_full.net.xml"/>
     </input>
 
     <output>
-        <output-file value="iitb_full.net.xml"/>
-        <plain-output-prefix value="/home/sdeepakmallya/ros_ws/src/tpbp_versions/graph_sumo/iitb_full"/>
+        <output-file value="/home/sdeepakmallya/ros_ws/src/mrpp_sumo/graph_sumo/iitb_full.net.xml"/>
+        <plain-output-prefix value="/home/sdeepakmallya/ros_ws/src/mrpp_sumo/graph_sumo/iitb_full"/>
     </output>
 
     <processing>
         <geometry.min-radius.fix.railways value="false"/>
         <geometry.max-grade.fix value="false"/>
         <offset.disable-normalization value="true"/>
-        <lefthand value="true"/>
+        <lefthand value="false"/>
     </processing>
 
     <junctions>
