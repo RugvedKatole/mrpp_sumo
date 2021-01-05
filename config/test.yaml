@@ -4,6 +4,5 @@ init_bots: 2
 init_locations: ''
 done: false
 sim_length: 20000
-discount_factor: 1
 random_string: test
 algo_name: random
