@@ -23,7 +23,7 @@ from mrpp_sumo.msg import AtNode
 
 class Sumo_Wrapper:
 
-    def __init__(self, graph, output_file):
+    def __init__(self, graph, output_file, output_file1):
         self.graph = graph
         self.edge_nodes = {}
         for e in self.graph.edges:
@@ -38,6 +38,7 @@ class Sumo_Wrapper:
         self.remove_bot_service = rospy.Service('remove_bot', RemoveBot, self.removing_bot)
         self.next_task_service = rospy.ServiceProxy('bot_next_task', NextTaskBot)
         self.output_file = open(output_file, 'a+')
+        self.output_file1 = open(output_file1, 'a+')
 
     #Adding bot at a specified location and then specifying its task
     def adding_bot(self, req):
@@ -95,8 +96,9 @@ def main():
     graph_name = rospy.get_param('/graph')
     file_name = rospy.get_param('/random_string')
     file_path = dirname + '/outputs/{}_command.in'.format(file_name)
+    file_path1 = dirname + '/outputs/{}_visits.in'.format(file_name)
     g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
-    s = Sumo_Wrapper(g, file_path)
+    s = Sumo_Wrapper(g, file_path, file_path1)
     sumo_startup = ['sumo', '-c', dirname + '/graph_sumo/{}.sumocfg'.format(graph_name), '--fcd-output', dirname + '/outputs/{}_vehicle.xml'.format(file_name)]
     # sumo_startup = ['sumo-gui', '-c', dirname + '/graph_sumo/{}.sumocfg'.format(graph_name)]
     traci.start(sumo_startup)
@@ -172,8 +174,13 @@ def main():
                     msg.node_id.append(s.edge_nodes[stop_edge][0])
                 pub.publish(msg)
 
+                s.output_file1.write(str(s.stamp) + '\n')
+                s.output_file1.write(' '.join(map(str, msg.node_id)) + '\n')
+                s.output_file1.write(' '.join(map(str, msg.robot_id)) + '\n')
+
             traci.simulationStep()
     s.output_file.close()
+    s.output_file1.close()
     traci.close()
 
 if __name__== '__main__':

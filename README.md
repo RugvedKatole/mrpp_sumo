@@ -33,7 +33,7 @@ Platform to test MRPP algorithms in SUMO via ROS
   
 ### Adding an MRPP algorithm
 
-Will be explained soon. Please be patient :D
+Coming Soon
 
 ### Pre Process
 - Add a *.yaml file to the /config folder with the required rosparameters (here's a list of required parameters) 
@@ -55,7 +55,6 @@ Will be explained soon. Please be patient :D
     rosparam load path_to_yaml_file
     rosrun mrpp_sumo sumo_wrapper.py
     rosrun mrpp_sumo path_to_algo_file
-    rosrun mrpp_sumo record_data.py
     rosrun mrpp_sumo command_center.py
 
 
@@ -71,4 +70,4 @@ Output from SUMO file
 
 ## To Do
 - Add scripts to generate plots for analysis 
-- Lotss of other cool stuff
+- Lots of other cool stuff

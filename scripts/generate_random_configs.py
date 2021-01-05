@@ -1,10 +1,7 @@
 #!/bin/usr/env python3
 
 '''
-Inputs: 
-1. graph_name
-2. number_of_priority_nodes
-3. multiplicity of cases
+A script to generate configs based on the parameters required
 
 Output:
 appropriate yaml files in config directory
