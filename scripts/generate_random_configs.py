@@ -40,7 +40,7 @@ if __name__ == '__main__':
                 for g in graph_name:
                     graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
                     i += 1
-                    with open(dir_name + '/config/axv{}.yaml'.format(i), 'w') as f:
+                    with open(dir_name + '/config/rxv{}.yaml'.format(i), 'w') as f:
                         f.write('use_sim_time: true\n')
                         f.write('graph: {}\n'.format(g))
                         # f.write('priority_nodes: {}\n'.format(' '.join(prior_nodes)))

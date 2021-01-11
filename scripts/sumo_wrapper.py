@@ -13,6 +13,7 @@ import networkx as nx
 import traci
 import configparser as CP
 import random as rn
+import time
 
 from rosgraph_msgs.msg import Clock
 
@@ -39,6 +40,7 @@ class Sumo_Wrapper:
         self.next_task_service = rospy.ServiceProxy('bot_next_task', NextTaskBot)
         self.output_file = open(output_file, 'a+')
         self.output_file1 = open(output_file1, 'a+')
+        self.robots_in_traci = []
 
     #Adding bot at a specified location and then specifying its task
     def adding_bot(self, req):
@@ -81,6 +83,7 @@ class Sumo_Wrapper:
     def removing_bot(self, req):
         if req.name in self.robots:
             self.robot_rem.append((req.name, req.stamp))
+            self.robots_in_traci.remove(req.name)
             return RemoveBotResponse(True)
         else:
             return RemoveBotResponse(False)
@@ -107,6 +110,7 @@ def main():
     while len(s.robots) < init_bots:
         print ("{} robots are yet to be initialized".format(init_bots - len(s.robots)))
 
+    time.sleep(1.0)
     while not done:
         done = rospy.get_param('done')
         s.stamp = traci.simulation.getTime()
@@ -116,7 +120,7 @@ def main():
         t.clock = rospy.Time(int(s.stamp))
         pub_time.publish(t)
 
-        in_sim_robots = traci.vehicle.getIDList()
+        # in_sim_robots = traci.vehicle.getIDList()
 
         for _, w in enumerate(s.robot_rem):
             if w[1] <= s.stamp and w[0] in s.robots:
@@ -133,7 +137,8 @@ def main():
             stopped_bots = []
             added_bots = []
             for robot in s.robots:
-                if (not robot in in_sim_robots) and (s.routes[robot]['d'][0] >= s.stamp):
+                # print (robot, s.robots_in_traci, s.routes[robot], s.stamp)
+                if (not robot in s.robots_in_traci) and (s.routes[robot]['d'][0] <= s.stamp):
                 # if not robot in in_sim_robots:
                     added_bots.append(robot)
                     # print (s.routes[robot]['r'][:1])
@@ -142,6 +147,8 @@ def main():
                     traci.vehicle.setStop(vehID = robot, edgeID = s.routes[robot]['r'][0], pos = traci.lane.getLength(s.routes[robot]['r'][0] + '_0'), duration = 1000.)
                     s.routes[robot]['r'].pop(0)
                     s.routes[robot]['d'].pop(0)
+                    s.robots_in_traci.append(robot)
+                    # in_sim_robots = traci.vehicle.getIDList()
                     
                 elif traci.vehicle.isStopped(vehID = robot) and not robot in s.robots_stopped_already:
                     # print (traci.vehicle.getStops(vehID = robot))

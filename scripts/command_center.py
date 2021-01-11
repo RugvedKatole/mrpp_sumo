@@ -4,6 +4,7 @@ import rospy, rospkg, rosparam
 import networkx as nx
 import random as rn 
 import sys, os
+import time
 
 from mrpp_sumo.srv import AddBot, RemoveBot
 
@@ -49,8 +50,10 @@ if __name__ == '__main__':
             n = rn.choice(list(graph.nodes()))
         else:
             n = bot_locations[i]
-        add_bot_client('bot_{}'.format(i), n)
+        l = add_bot_client('bot_{}'.format(i), n)
+        print (l)
         cur_bots.append('bot_{}'.format(i))
+        time.sleep(1.0)
 
 
     while rospy.get_time() <= sim_length:
