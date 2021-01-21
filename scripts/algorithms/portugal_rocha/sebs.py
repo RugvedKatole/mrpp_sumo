@@ -22,6 +22,7 @@ class SEBS:
         self.alpha_dur = 0.1
         self.L = 0.1
         self.M = 1.
+        self.v_max = 10.
 
         self.stamp = 0.
         self.num_robots = num_robots
@@ -70,7 +71,6 @@ class SEBS:
         t = req.stamp
         bot = req.name
         print ('Time {}, Bot {}, Node {}'.format(t, bot, node))
-        priors = []
         neigh = list(self.graph.successors(node))
         if bot not in self.robots.keys():
             self.robots[bot] = {}
@@ -85,9 +85,12 @@ class SEBS:
             s_1 = 2 ** (self.num_robots - s - 1)/(2 ** self.num_robots - 1)
             p_g.append(g_1 * s_1)
 
-        max_ids = list(np.where(p_g == np.amax(p_g))[0])
-        max_id = rn.sample(max_ids, 1)[0]
-        next_node = neigh[max_id]
+        if len(neigh) > 1:
+            max_ids = list(np.where(p_g == np.amax(p_g))[0])
+            max_id = rn.sample(max_ids, 1)[0]
+            next_node = neigh[max_id]
+        else:
+            next_node = neigh[0]
         next_walk = [node, next_node]
         next_departs = [t]
         self.graph.nodes[next_node]['future_visits'][bot] = self.graph[node][next_node]['duration']
@@ -101,7 +104,7 @@ if __name__ == '__main__':
     graph_name = rospy.get_param('/graph')
     g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
     num_robots = int(rospy.get_param('/init_bots'))
-    s = SEBS(g, algo_name, file_path, num_robots)
+    s = SEBS(g, num_robots)
     rospy.Subscriber('at_node', AtNode, s.callback_idle)
     rospy.Service('bot_next_task', NextTaskBot, s.callback_next_task)
 

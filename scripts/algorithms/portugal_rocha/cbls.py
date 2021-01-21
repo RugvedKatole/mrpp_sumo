@@ -106,15 +106,22 @@ class CBLS:
         prob_move /= np.sum(prob_move)
         prob_move = list(prob_move)
         # print ('neigh', len(neigh), 'prob_move', prob_move)
-        ent = - np.sum(prob_move * np.log2(prob_move)) / np.log2(len(neigh))
+        if len(neigh) > 1:
+            ent = - np.sum(prob_move * np.log2(prob_move)) / np.log2(len(neigh))
+            max_ids = list(np.where(prob_move == np.amax(prob_move))[0])
+            max_id = rn.sample(max_ids, 1)[0]
+        else:
+            ent = 0.
+            max_id = 0
         # print ('ent', ent)
-        max_ids = list(np.where(prob_move == np.amax(prob_move))[0])
-        max_id = rn.sample(max_ids, 1)[0]
+
         next_node = neigh[max_id]
 
         temp1 = prob_move.copy()
         temp2 = neigh.copy()
         while len(self.graph.nodes[next_node]['future_visits'].keys()) > 0:
+            if len(temp1) == 1:
+                break
             temp2.remove(next_node)
             # max_ids.pop(0)
             temp1.pop(max_id)

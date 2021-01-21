@@ -6,7 +6,9 @@ import rospkg
 import glob
 
 dir_name = rospkg.RosPack().get_path('mrpp_sumo')
-config_files = glob.glob(dir_name + '/config/rxv*.yaml')
+config_files = glob.glob(dir_name + '/config/sxv*.yaml')
+count = 0
 for conf in config_files:
     os.system('xterm -e "{}/tpbp.sh" {}'.format(dir_name, conf))
-    print ('Done {}'.format(conf))
+    count += 1
+    print ('{} Done {}'.format(count, conf))
