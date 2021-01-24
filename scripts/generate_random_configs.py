@@ -19,7 +19,7 @@ if __name__ == '__main__':
         graph_name = ['cair', 'circle', 'grid_5_5', 'iitb', 'ladder', 'st_line', 'st_line_assym']
         multiplicity = 3
 
-        algo_name = 'sebs'
+        algo_name = 'random_coordinator'
         vel = 10.
         # prior_nodes = rn.sample(graph.nodes(), num_priority)
         # prior_nodes = ['0', '4', '20', '24']
@@ -40,7 +40,7 @@ if __name__ == '__main__':
                 for g in graph_name:
                     graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
                     i += 1
-                    with open(dir_name + '/config/sxv{}.yaml'.format(i), 'w') as f:
+                    with open(dir_name + '/config/frv{}.yaml'.format(i), 'w') as f:
                         f.write('use_sim_time: true\n')
                         f.write('graph: {}\n'.format(g))
                         # f.write('priority_nodes: {}\n'.format(' '.join(prior_nodes)))
@@ -54,7 +54,7 @@ if __name__ == '__main__':
                         f.write('done: false\n')
                         f.write('sim_length: {}\n'.format(sim_length))
                         # f.write('discount_factor: {}\n'.format(d))
-                        f.write('random_string: sxv{}\n'.format(i))
+                        f.write('random_string: frv{}\n'.format(i))
                         f.write('algo_name: {}'.format(algo_name))
                     print (i)
     else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-Conscientious Reactive
+Conscientious Cognitive
 '''
 
 import rospkg
@@ -12,7 +12,7 @@ from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse
 from mrpp_sumo.msg import AtNode
 import random as rn
 
-class CR:
+class CC:
 
     def __init__(self, g, num_bots):
         self.graph = g
@@ -43,20 +43,21 @@ class CR:
         node = req.node_done
         t = req.stamp
         bot = req.name
-        
+
         self.robots[bot][node] = 0.
 
-        neigh = list(self.graph.successors(node))
         idles = []
-        for n in neigh:
+        for n in self.nodes:
             idles.append(self.robots[bot][n])
-
+        
         max_id = 0
-        if len(neigh) > 1:
-            max_ids = list(np.where(idles == np.amax(idles))[0])
-            max_id = rn.sample(max_ids, 1)[0]
-        next_walk = [node, neigh[max_id]]
-        next_departs = [t]
+        max_ids = list(np.where(idles == np.amax(idles))[0])
+        max_id = rn.sample(max_ids, 1)[0]
+        dest_node = self.nodes[max_id]
+        while dest_node == node:
+            dest_node = rn.sample(self.nodes, 1)[0]
+        next_walk = nx.dijkstra_path(g, node, dest_node, 'length')
+        next_departs = [t] * (len(next_walk) - 1)
         return NextTaskBotResponse(next_departs, next_walk)
 
 
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     num_bots = int(rospy.get_param('/init_bots'))
     g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
 
-    s = CR(g, num_bots)
+    s = CC(g, num_bots)
 
     rospy.Subscriber('at_node', AtNode, s.callback_idle)
     rospy.Service('bot_next_task', NextTaskBot, s.callback_next_task)

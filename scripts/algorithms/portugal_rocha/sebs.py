@@ -70,6 +70,7 @@ class SEBS:
         node = req.node_done
         t = req.stamp
         bot = req.name
+
         print ('Time {}, Bot {}, Node {}'.format(t, bot, node))
         neigh = list(self.graph.successors(node))
         if bot not in self.robots.keys():

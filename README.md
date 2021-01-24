@@ -14,6 +14,12 @@ Platform to test MRPP algorithms in SUMO via ROS
 
       export SUMO_HOME=/usr/share/sumo
       export PYTHONPATH=$SUMO_HOME/tools:$PYTHONPATH
+
+- Ensure that the scripts are executable
+
+      chmod -R 755 /path/to/mrpp_sumo/scripts/
+      
+
 - Enjoy!(?)
 
 ## How to use
