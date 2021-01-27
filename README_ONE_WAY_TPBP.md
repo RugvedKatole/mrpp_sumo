@@ -24,4 +24,4 @@
 - coefficients: values of c1, c2, c3 and c4 with ' ' spacing in between
 - num_dummy_nodes: number of dummy priority nodes considered for randomisation
 - reshuffle_time: time between reshuffling of dummy nodes
-        
+- one_way: add pairs of nodes incident on the single lanes in the graph (ex: '0 1 5 10' in grid_5_5 graph would convey that the edges between nodes 0-1 and 5-10 are single lane)
