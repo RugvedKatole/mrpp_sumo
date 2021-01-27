@@ -59,6 +59,7 @@ add_service_files(
   AddBot.srv
   NextTaskBot.srv
   RemoveBot.srv
+  AlgoReady.srv
 )
 
 ## Generate actions in the 'action' folder

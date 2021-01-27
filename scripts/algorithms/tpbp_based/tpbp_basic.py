@@ -19,7 +19,7 @@ from mrpp_sumo.msg import AtNode
 import tpbp_functions as func_tp
 
 class TPBP_Basic:
-    def __init__(self, g, priority_nodes, time_periods, lambda_priority, length_walk, max_div, eps_prob, discount_factor, algo_name, file_path):
+    def __init__(self, g, priority_nodes, time_periods, lambda_priority, length_walk, max_div, eps_prob, discount_factor, algo_name):
 
         self.robots = {}
 
@@ -45,7 +45,6 @@ class TPBP_Basic:
         self.cf = self.plan_time/self.max_div
         self.discount_factor = discount_factor
         self.algo_name = algo_name
-        self.file_path = file_path
         self.stamp = 0.0
         
         self.assigned = []
@@ -250,7 +249,7 @@ if __name__ == '__main__':
     eps_prob = float(rospy.get_param('/eps_prob'))
     discount_factor = float(rospy.get_param('/discount_factor'))
     algo_name = rospy.get_param('/algo_name')
-    s = TPBP_Basic(g, priority_nodes, time_periods, lambda_priority, length_walk, max_div, eps_prob, discount_factor, algo_name, file_path)
+    s = TPBP_Basic(g, priority_nodes, time_periods, lambda_priority, length_walk, max_div, eps_prob, discount_factor, algo_name)
 
     rospy.Subscriber('at_node', AtNode, s.callback_idle)
     rospy.Timer(rospy.Duration(50), s.update_adj_matrix)
