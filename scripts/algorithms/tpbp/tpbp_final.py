@@ -184,8 +184,14 @@ class TPBP:
         t = req.stamp
         node = req.node_done
 
+
         if node in self.non_priority_assigned:
             self.non_priority_assigned.remove(node)
+
+        if node in self.priority_nodes_cur:
+            self.assigned[self.priority_nodes_cur.index(node)] = False
+
+        print (node, self.priority_nodes_cur, self.assigned)
 
         best_reward = -np.inf
         next_walk = []
@@ -207,6 +213,7 @@ class TPBP:
                             next_walk = line2
         
         if all(self.assigned):
+            print ('alive')
             idles = []
             for i in self.non_priority_nodes:
                 idles.append(self.graph.nodes[i]['idleness'])
@@ -216,14 +223,26 @@ class TPBP:
             max_id = rn.sample(max_ids, 1)[0]
             dest_node = self.non_priority_nodes[max_id]
             temp = self.non_priority_nodes.copy()
-            while dest_node in self.non_priority_assigned:
-                temp.remove(dest_node)
-                idles.pop(max_id)
-                max_ids = list(np.where(idles == np.amax(idles))[0])
-                max_id = rn.sample(max_ids, 1)[0]
-                dest_node = temp[max_id]
+            while dest_node in self.non_priority_assigned or dest_node == node:
+                if len(temp) == 1:
+                    if dest_node == node:
+                        temp1 = self.non_priority_nodes.copy()
+                        temp1.remove(node)
+                        dest_node = rn.sample(temp1, 1)[0]
+                    break
+                else:
+                    temp.remove(dest_node)
+                    idles.pop(max_id)
+                    max_ids = list(np.where(idles == np.amax(idles))[0])
+                    max_id = rn.sample(max_ids, 1)[0]
+                    dest_node = temp[max_id]
+            if not dest_node in self.non_priority_assigned:
+                self.non_priority_assigned.append(dest_node)
             next_walk = nx.dijkstra_path(g, node, dest_node, 'length')
         
+        else:
+            self.assigned[self.priority_nodes_cur.index(next_walk[-1])] = True
+
         next_departs = [t] * (len(next_walk) - 1)
         
         return NextTaskBotResponse(next_departs, next_walk)

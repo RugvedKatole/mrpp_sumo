@@ -110,7 +110,7 @@ def main():
         one_way_edges[g[one_way_temp[i]][one_way_temp[i + 1]]['name']] = {'edge': g[one_way_temp[i + 1]][one_way_temp[i]]['name'], 'blocked': False}
         one_way_edges[g[one_way_temp[i + 1]][one_way_temp[i]]['name']] = {'edge': g[one_way_temp[i]][one_way_temp[i + 1]]['name'], 'blocked': False}
     # sumo_startup = ['sumo', '-c', dirname + '/graph_sumo/{}.sumocfg'.format(graph_name), '--fcd-output', dirname + '/outputs/{}_vehicle.xml'.format(file_name)]
-    sumo_startup = ['sumo-gui', '-c', dirname + '/graph_sumo/{}.sumocfg'.format(graph_name)]
+    sumo_startup = ['sumo-gui', '-c', dirname + '/graph_sumo/{}.sumocfg'.format(graph_name), '--fcd-output', dirname + '/outputs/{}_vehicle.xml'.format(file_name)]
     traci.start(sumo_startup)
 
     init_bots = int(rospy.get_param('/init_bots'))
@@ -165,9 +165,13 @@ def main():
                     # print (traci.vehicle.getStops(vehID = robot))              
                     if len(s.routes[robot]['r']) == 0:
                         s.next_task_update(robot, traci.vehicle.getRoute(vehID = robot)[-1])
+                    print (robot, s.routes[robot]['r'][0])
                     if s.routes[robot]['r'][0] in one_way_edges.keys() and one_way_edges[s.routes[robot]['r'][0]]['blocked']:
-                        pass
+                        one_way_edges[one_way_edges[s.routes[robot]['r'][0]]['edge']]['blocked'] = True                            
+
                     else:
+                        if s.routes[robot]['r'][0] in one_way_edges.keys():
+                            one_way_edges[one_way_edges[s.routes[robot]['r'][0]]['edge']]['blocked'] = True                            
                         d = s.routes[robot]['d'].pop(0)
                         next_edges = [traci.vehicle.getRoute(vehID = robot)[-1], s.routes[robot]['r'].pop(0)]
                         traci.vehicle.setRoute(vehID = robot, edgeList = next_edges)
@@ -178,6 +182,7 @@ def main():
                 
                 elif not traci.vehicle.isStopped(vehID = robot) and robot in s.robots_stopped_already:
                     s.robots_stopped_already.remove(robot)
+
             
             if len(stopped_bots) + len(added_bots) > 0:
                 msg = AtNode()
@@ -202,7 +207,7 @@ def main():
             for e in one_way_edges.keys():
                 if traci.edge.getLastStepVehicleNumber(e) - traci.edge.getLastStepHaltingNumber(e) > 0:
                     one_way_edges[one_way_edges[e]['edge']]['blocked'] = True
-                    traci.edge.setParameter(one_way_edges[e]['edge'], 'color', 'blue')
+                    # traci.edge.setParameter(one_way_edges[e]['edge'], 'color', 'blue')
                 else:
                     one_way_edges[one_way_edges[e]['edge']]['blocked'] = False
 
