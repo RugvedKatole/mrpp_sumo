@@ -8,13 +8,14 @@ import rospkg
 import numpy as np
 import rospy
 import networkx as nx
-from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse
+from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse, AlgoReady, AlgoReadyResponse
 from mrpp_sumo.msg import AtNode 
 import random as rn
 
 class SEBS:
 
     def __init__(self, g, num_robots):
+        self.ready = False
         self.robots = {}
 
         #Hyper-parameters
@@ -33,6 +34,16 @@ class SEBS:
             self.graph.nodes[node]['future_visits'] = {}
         for edge in self.graph.edges():
             self.graph[edge[0]][edge[1]]['duration'] = self.graph[edge[0]][edge[1]]['length']/self.v_max
+
+        rospy.Service('algo_ready', AlgoReady, self.callback_ready)
+        self.ready = True
+
+    def callback_ready(self, req):
+        algo_name = req.algo
+        if algo_name == 'sebs' and self.ready:
+            return AlgoReadyResponse(True)
+        else:
+            return AlgoReadyResponse(False)
 
     def callback_idle(self, data):
         if self.stamp < data.stamp:
@@ -71,7 +82,7 @@ class SEBS:
         t = req.stamp
         bot = req.name
 
-        print ('Time {}, Bot {}, Node {}'.format(t, bot, node))
+        # print ('Time {}, Bot {}, Node {}'.format(t, bot, node))
         neigh = list(self.graph.successors(node))
         if bot not in self.robots.keys():
             self.robots[bot] = {}
@@ -88,7 +99,7 @@ class SEBS:
 
         if len(neigh) > 1:
             max_ids = list(np.where(p_g == np.amax(p_g))[0])
-            max_id = rn.sample(max_ids, 1)[0]
+            max_id = int(rn.sample(max_ids, 1)[0])
             next_node = neigh[max_id]
         else:
             next_node = neigh[0]

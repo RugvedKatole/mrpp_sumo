@@ -35,7 +35,7 @@ Platform to test MRPP algorithms in SUMO via ROS
       
       python3 scripts/sumo_to_graphml.py [graph_name]
 
-  This file stores the graph information in a networkx compatible format.
+  This file stores the graph information in a NetworkX compatible format.
   
 ### Adding an MRPP algorithm
 
@@ -50,10 +50,12 @@ Coming Soon
     - algo_name 
     - sim_length (in secs)
     - init_locations: '' (if empty, locations picked at random)
+  
+  You may need to add additional parameters depending on the patrolling algorithm.
 
-- Add a *.graphml file in /graph_ml folder and a *.nod.xml, *.edg.xml, *.net.xml, *.sumocfg in /graph_sumo for the corresponding graphs
+- Add a *.graphml file in ./graph_ml folder and a *.nod.xml, *.edg.xml, *.net.xml, *.sumocfg in /graph_sumo for the corresponding graphs
 
-- Create an /outputs folder (if not already)
+- Create a ./outputs folder (if not already)
 
 
 ### Running a simulation
@@ -62,6 +64,10 @@ Coming Soon
     rosrun mrpp_sumo sumo_wrapper.py
     rosrun mrpp_sumo path_to_algo_file
     rosrun mrpp_sumo command_center.py
+
+Alternatively
+
+    ./tpbp.sh path_to_yaml_file
 
 
 ### Post Process

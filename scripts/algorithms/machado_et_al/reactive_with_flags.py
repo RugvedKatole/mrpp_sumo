@@ -8,19 +8,21 @@ import rospkg
 import numpy as np
 import rospy
 import networkx as nx
-from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse
+from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse, AlgoReady, AlgoReadyResponse
 from mrpp_sumo.msg import AtNode
 import random as rn
 
 class RR:
 
     def __init__(self, g):
+        self.ready = False
         self.graph = g
         self.stamp = 0.
 
         for node in self.graph.nodes():
             self.graph.nodes[node]['idleness'] = 0.
-
+        rospy.Service('algo_ready', AlgoReady, self.callback_ready)
+        self.ready = True
 
     def callback_idle(self, data):
         if self.stamp < data.stamp:
@@ -52,6 +54,12 @@ class RR:
         next_departs = [t]
         return NextTaskBotResponse(next_departs, next_walk)
 
+    def callback_ready(self, req):
+        algo_name = req.algo
+        if algo_name == 'reactive_with_flags' and self.ready:
+            return AlgoReadyResponse(True)
+        else:
+            return AlgoReadyResponse(False)
 
 if __name__ == '__main__':
     rospy.init_node('rr', anonymous= True)
