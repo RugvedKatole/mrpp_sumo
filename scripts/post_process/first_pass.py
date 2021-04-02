@@ -26,7 +26,7 @@ dirname = rospkg.RosPack().get_path('mrpp_sumo')
 
 # %%
 #name of the yaml/output files
-name = 'arv2'
+name = 'arv25'
 
 #path to directory containing 'config' and 'outputs'
 dirdata = '/home/sdeepakmallya/data_hd/mrpp_sumo_backup/27_01_2021/'
@@ -104,10 +104,6 @@ df2.set_index('time')
 
 
 # %%
-df3
-
-
-# %%
 # plot scatter plot of idleness vs time for all nodes
 
 plt.figure()
@@ -125,7 +121,7 @@ plt.show()
 
 
 # %%
-d = 10 #radius of nodes
+d = 20 #radius of nodes
 edge_x = []
 edge_y = []
 for edge in graph.edges():
@@ -188,7 +184,9 @@ fig = go.Figure(data=[node_trace],
             hovermode='closest',
             margin=dict(b=20,l=5,r=5,t=40),
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            width=1200,
+            height=1000)
             )
 
 # fig.add_trace(go.Heatmap(x = node_x, y = node_y, z = node_z))
@@ -218,8 +216,8 @@ for i in range(0, len(edge_x), 3):
             yt = y0
             yh = y1
         else:
-            xt = x0 + math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
-            xh = x1 - math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+            xt = x0 + math.sqrt((d) ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+            xh = x1 - math.sqrt((d) ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
             yt = m * xt + c
             yh = m * xh + c
     
@@ -264,8 +262,8 @@ avg_trace = go.Scatter(
         reversescale=False,
         color=avg_idle,
         size=2 * d,
-        cmin = 0.,
-        cmax = 200.,
+        # cmin = 0.,
+        # cmax = 200.,
         # opacity = 0.5,
         # showscale = False,
         colorbar=dict(
@@ -285,8 +283,9 @@ fig = go.Figure(data=[avg_trace],
             hovermode='closest',
             margin=dict(b=20,l=5,r=0,t=40),
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-            )
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            width=1200,
+            height=1000))
 
 # fig.add_trace(go.Heatmap(x = node_x, y = node_y, z = node_z))
 for i in range(0, len(edge_x), 3):
@@ -362,8 +361,8 @@ max_trace = go.Scatter(
         reversescale=False,
         color=max_idle,
         size=2 * d,
-        cmin = 0.,
-        cmax = 300.,
+        # cmin = 0.,
+        # cmax = 300.,
         # opacity = 0.5,
         # showscale = False,
         colorbar=dict(
@@ -382,7 +381,9 @@ fig = go.Figure(data=[max_trace],
             hovermode='closest',
             margin=dict(b=20,l=5,r=0,t=40),
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False), 
+            width=1200,
+            height=1000)
             )
 
 # fig.add_trace(go.Heatmap(x = node_x, y = node_y, z = node_z))
@@ -459,8 +460,8 @@ for n in nodes:
 # print(prob_next_visit)
 # print(edges)
 max_count = max(list(next_edge_count.values()))
-print(max_count)
-l = 30
+# print(max_count)
+l = 100
 edge_trace = go.Scatter(x=edge_x, y=edge_y, line=dict(width=0.5, color='#888', shape = 'linear'), opacity= 0.5, hoverinfo='none', mode='lines')
 
 node_trace = go.Scatter(
@@ -477,8 +478,8 @@ node_trace = go.Scatter(
         reversescale=False,
         color=[],
         size=2 * d,
-        cmin = 0.,
-        cmax = 300.,
+        # cmin = 0.,
+        # cmax = 300.,
         # opacity = 0.5,
         # showscale = False,
         colorbar=dict(
@@ -497,7 +498,9 @@ fig = go.Figure(data=[node_trace, edge_trace],
             hovermode='closest',
             margin=dict(b=20,l=5,r=0,t=40),
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            width=1200,
+            height= 1000)
             )
 
 # fig.add_trace(go.Heatmap(x = node_x, y = node_y, z = node_z))
@@ -563,10 +566,10 @@ fig.show()
 
 # %%
 #Bot Histogram
-edge_trace = go.Scatter(x=edge_x, y=edge_y, line=dict(width=0.5, color='#888', shape = 'linear'), opacity= 0.5, hoverinfo='none', mode='lines')
+edge_trace = go.Scatter3d(x=edge_x, y=edge_y, z=[0] * len(edge_x), opacity=1, hoverinfo='none', mode='lines')
 
-node_trace = go.Scatter(
-    x=node_x, y=node_y,
+node_trace = go.Scatter3d(
+    x=node_x, y=node_y,z=[0] * len(nodes),
     mode='markers',
     hoverinfo='text',
     marker=dict(
@@ -578,7 +581,7 @@ node_trace = go.Scatter(
         colorscale='Blues',
         reversescale=False,
         color=[],
-        size=2 * d,
+        size=2 * d/10,
         cmin = 0.,
         cmax = 300.,
         # opacity = 0.5,
@@ -603,14 +606,10 @@ fig = go.Figure(data=[node_trace, edge_trace],
             )
 
 for bot in df3.index:
-    print(bot)
+    # print(bot)
     h = [df3[n][bot] for n in nodes]
-    fig.add_trace(go.Surface(x = node_x, y = node_y, z = h))
+    fig.add_trace(go.Mesh3d(x = node_x, y = node_y, z = h, opacity= 0.3, name = bot))
+fig.update_traces(alphahull = -1, selector= dict(type = 'mesh3d'))
 fig.show()
-
-# %%
-df3 = pd.DataFrame(columns = nodes, index = ['bot_{}'.format(i) for i in range(num_bots)])
-df3 = df3.fillna(0)
-print(df3['gneJ13']['bot_0'])
 
 

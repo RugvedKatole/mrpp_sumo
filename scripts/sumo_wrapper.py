@@ -35,6 +35,7 @@ class Sumo_Wrapper:
         self.robot_rem = []
         self.routes = {}
         self.robots_stopped_already = []
+        self.robots_just_stopped = []
         self.add_bot_service = rospy.Service('add_bot', AddBot, self.adding_bot)
         self.remove_bot_service = rospy.Service('remove_bot', RemoveBot, self.removing_bot)
         self.next_task_service = rospy.ServiceProxy('bot_next_task', NextTaskBot)
@@ -150,7 +151,11 @@ def main():
                     s.robots_in_traci.append(robot)
                     # in_sim_robots = traci.vehicle.getIDList()
                     
-                elif traci.vehicle.isStopped(vehID = robot) and not robot in s.robots_stopped_already:
+                elif traci.vehicle.isStopped(vehID = robot) and not robot in s.robots_just_stopped:
+                    stopped_bots.append(robot)
+                    s.robots_just_stopped.append(robot)
+                
+                elif traci.vehicle.isStopped(vehID = robot) and robot in s.robots_just_stopped and not robot in s.robots_stopped_already:
                     # print (traci.vehicle.getStops(vehID = robot))
                     if len(s.routes[robot]['r']) == 0:
                         s.next_task_update(robot, traci.vehicle.getRoute(vehID = robot)[-1])
@@ -160,10 +165,11 @@ def main():
                     traci.vehicle.setStop(vehID = robot, edgeID = next_edges[0], pos = traci.lane.getLength(next_edges[0] + '_0'), duration = float(d - s.stamp))
                     traci.vehicle.setStop(vehID = robot, edgeID = next_edges[1], pos = traci.lane.getLength(next_edges[1] + '_0'), duration = 1000.)
                     s.robots_stopped_already.append(robot)
-                    stopped_bots.append(robot)
+                    # stopped_bots.append(robot)
                 
                 elif not traci.vehicle.isStopped(vehID = robot) and robot in s.robots_stopped_already:
                     s.robots_stopped_already.remove(robot)
+                    s.robots_just_stopped.remove(robot)
             
             if len(stopped_bots) + len(added_bots) > 0:
                 msg = AtNode()
