@@ -6,7 +6,11 @@ Platform to test MRPP algorithms in SUMO via ROS
 - [ROS - Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu)
 - Python Packages
 
+<<<<<<< HEAD
       python3 -m pip install networkx configparser pandas seaborn numpy threading rospkg catkin_pkg kaleido
+=======
+      python3 -m pip install networkx configparser pandas seaborn numpy threaded rospkg catkin_pkg
+>>>>>>> 38a609563a46278b842af6447b14142bddbd9576
 
 ## Installation
 - Clone into your ros workspace
