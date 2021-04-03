@@ -34,13 +34,14 @@ if __name__ == '__main__':
         init_bots = [1, 2, 4, 6]
         sim_length = 20000
         # discount_factors = [1]
+        random_string  = 'frv'
         i = 0
         for _ in range(multiplicity):
             for ib in init_bots:
                 for g in graph_name:
                     graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
                     i += 1
-                    with open(dir_name + '/config/frv{}.yaml'.format(i), 'w') as f:
+                    with open(dir_name + '/config/{}{}.yaml'.format(random_string, i), 'w') as f:
                         f.write('use_sim_time: true\n')
                         f.write('graph: {}\n'.format(g))
                         # f.write('priority_nodes: {}\n'.format(' '.join(prior_nodes)))
@@ -54,7 +55,7 @@ if __name__ == '__main__':
                         f.write('done: false\n')
                         f.write('sim_length: {}\n'.format(sim_length))
                         # f.write('discount_factor: {}\n'.format(d))
-                        f.write('random_string: frv{}\n'.format(i))
+                        f.write('random_string: {}{}\n'.format(random_string, i))
                         f.write('algo_name: {}'.format(algo_name))
                     print (i)
     else:

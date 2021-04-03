@@ -1,6 +1,11 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 
+
+'''
+Generate plots and csv files
+command: python3 sim_visualize.py 'config_name'
+'''
 import seaborn as sns
 import networkx as nx
 import plotly.graph_objects as go
