@@ -127,6 +127,7 @@ class BBLA:
                 if qs[act]['val'] > val:
                     val = qs[act]['val']
                     nex = act
+            self.q_values[node][prev][max_node][min_node][nex]['count'] += 1
 
         self.bot_last[bot] = [node, prev, max_node, min_node, nex]
         next_walk = [node, nex]

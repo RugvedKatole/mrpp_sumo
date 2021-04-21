@@ -111,9 +111,9 @@ def main(param):
     df1.set_index('time')
     df2.set_index('time')
 
-    df1.to_csv(sim_dir + '/{}_node.csv'.format(name))
-    df2.to_csv(sim_dir + '/{}_edge.csv'.format(name))
-    df3.to_csv(sim_dir + '/{}_bot.csv'.format(name))
+    df1.to_csv(sim_dir + '/{}_node.csv'.format(name), index = False)
+    df2.to_csv(sim_dir + '/{}_edge.csv'.format(name), index = False)
+    df3.to_csv(sim_dir + '/{}_bot.csv'.format(name), index = False)
     
     #scatter plot of instantaneous idleness
     plt.figure()
@@ -129,10 +129,13 @@ def main(param):
     plt.ylabel('Node Idleness')
 
     plt.savefig('{}/{}_scatter.png'.format(sim_dir, name), bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
 
     d = 20 #radius of nodes
+    edge_vis = {'cair': d/2, 'circle': d/2, 'grid_5_5': d/2, 'iitb': d, 'ladder': d/2, 'st_line': d, 'st_line_assym': d}
+    s = int(edge_vis[config['graph']])
+    # print(s)
     edge_x = []
     edge_y = []
     for edge in graph.edges():
@@ -212,19 +215,19 @@ def main(param):
             vert = False
         
         if vert:
-            yt = y0 + d * np.sign(y1 - y0)
-            yh = y1 - d * np.sign(y1 - y0)
+            yt = y0 + s * np.sign(y1 - y0)
+            yh = y1 - s * np.sign(y1 - y0)
             xt = x0
             xh = x1
         else:
             if y1 == y0:
-                xt = x0 + d * np.sign(x1 - x0)
-                xh = x1 - d * np.sign(x1 - x0)
+                xt = x0 + s * np.sign(x1 - x0)
+                xh = x1 - s * np.sign(x1 - x0)
                 yt = y0
                 yh = y1
             else:
-                xt = x0 + math.sqrt((d) ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
-                xh = x1 - math.sqrt((d) ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xt = x0 + math.sqrt((s) ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xh = x1 - math.sqrt((s) ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
                 yt = m * xt + c
                 yh = m * xh + c
         
@@ -252,7 +255,7 @@ def main(param):
     fig.update_layout(title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
     fig.to_image(format="png", engine="kaleido")
     fig.write_image('{}/{}_graph.png'.format(sim_dir, name))
-    fig.show()
+    # fig.show()
     del fig
 
     #color map of average idleness
@@ -280,7 +283,7 @@ def main(param):
                 xanchor='right',
                 titleside='top',
             ),
-            line_width=0))
+            line_width=2))
     # avg_trace.marker.cmin = 200
 
     fig = go.Figure(data=[avg_trace],
@@ -311,19 +314,19 @@ def main(param):
             vert = False
         
         if vert:
-            yt = y0 + d * np.sign(y1 - y0)
-            yh = y1 - d * np.sign(y1 - y0)
+            yt = y0 + s * np.sign(y1 - y0)
+            yh = y1 - s * np.sign(y1 - y0)
             xt = x0
             xh = x1
         else:
             if y1 == y0:
-                xt = x0 + d * np.sign(x1 - x0)
-                xh = x1 - d * np.sign(x1 - x0)
+                xt = x0 + s * np.sign(x1 - x0)
+                xh = x1 - s * np.sign(x1 - x0)
                 yt = y0
                 yh = y1
             else:
-                xt = x0 + math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
-                xh = x1 - math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xt = x0 + math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xh = x1 - math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
                 yt = m * xt + c
                 yh = m * xh + c
         
@@ -351,7 +354,7 @@ def main(param):
     fig.update_layout(title_text='Average Node Idleness', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
     fig.to_image(format="png", engine="kaleido")
     fig.write_image('{}/{}_avg_idle.png'.format(sim_dir, name))
-    fig.show()
+    # fig.show()
     del fig
 
     #color map of maximum idleness
@@ -379,7 +382,7 @@ def main(param):
                 xanchor='right',
                 titleside='top'
             ),
-            line_width=0))
+            line_width=2))
 
     fig = go.Figure(data=[max_trace],
                 layout=go.Layout(
@@ -410,19 +413,19 @@ def main(param):
             vert = False
         
         if vert:
-            yt = y0 + d * np.sign(y1 - y0)
-            yh = y1 - d * np.sign(y1 - y0)
+            yt = y0 + s * np.sign(y1 - y0)
+            yh = y1 - s * np.sign(y1 - y0)
             xt = x0
             xh = x1
         else:
             if y1 == y0:
-                xt = x0 + d * np.sign(x1 - x0)
-                xh = x1 - d * np.sign(x1 - x0)
+                xt = x0 + s * np.sign(x1 - x0)
+                xh = x1 - s * np.sign(x1 - x0)
                 yt = y0
                 yh = y1
             else:
-                xt = x0 + math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
-                xh = x1 - math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xt = x0 + math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xh = x1 - math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
                 yt = m * xt + c
                 yh = m * xh + c
         
@@ -450,7 +453,7 @@ def main(param):
     fig.update_layout(title_text='Maximum Node Idleness', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
     fig.to_image(format="png", engine="kaleido")
     fig.write_image('{}/{}_max_idle.png'.format(sim_dir, name))
-    fig.show()
+    # fig.show()
     del fig
 
 
@@ -461,16 +464,18 @@ def main(param):
     for n in nodes:
         succ = list(graph.successors(n))
         total_visits = 0
-        for s in succ:
-            total_visits += next_edge_count[graph[n][s]['name']]
-        for s in succ:
-            prob_next_visit[graph[n][s]['name']] = next_edge_count[graph[n][s]['name']]/total_visits
+        for k in succ:
+            total_visits += next_edge_count[graph[n][k]['name']]
+        for k in succ:
+            if total_visits == 0:
+                total_visits = 1
+            prob_next_visit[graph[n][k]['name']] = next_edge_count[graph[n][k]['name']]/total_visits
 
     # print(prob_next_visit)
     # print(edges)
     max_count = max(list(next_edge_count.values()))
     # print(max_count)
-    l = 100
+    l = 30
     edge_trace = go.Scatter(x=edge_x, y=edge_y, line=dict(width=0.5, color='#888', shape = 'linear'), opacity= 0.5, hoverinfo='none', mode='lines')
 
     node_trace = go.Scatter(
@@ -483,9 +488,9 @@ def main(param):
             #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
             #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
             #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
-            colorscale='Blues',
+            # colorscale='#000000',
             reversescale=False,
-            color=[],
+            color='white',
             size=2 * d,
             # cmin = 0.,
             # cmax = 300.,
@@ -497,7 +502,7 @@ def main(param):
                 xanchor='right',
                 titleside='top'
             ),
-            line_width=0))
+            line_width=2))
 
     fig = go.Figure(data=[node_trace, edge_trace],
                 layout=go.Layout(
@@ -530,18 +535,18 @@ def main(param):
             vert = False
         
         if vert:
-            yt = y0 + d * np.sign(y1 - y0)
+            yt = y0 + s * np.sign(y1 - y0)
             yh = yt + len_e * np.sign(y1 - y0)
             xt = x0
             xh = x1
         else:
             if y1 == y0:
-                xt = x0 + d * np.sign(x1 - x0)
+                xt = x0 + s * np.sign(x1 - x0)
                 xh = xt + len_e * np.sign(x1 - x0)
                 yt = y0
                 yh = y1
             else:
-                xt = x0 + math.sqrt(d ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xt = x0 + math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
                 xh = xt + math.sqrt(len_e ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
                 yt = m * xt + c
                 yh = m * xh + c
@@ -571,7 +576,7 @@ def main(param):
     fig.update_layout(title_text = 'Distribution over Neighbours', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
     fig.to_image(format="png", engine="kaleido")
     fig.write_image('{}/{}_dist_neigh.png'.format(sim_dir, name))
-    fig.show()
+    # fig.show()
     del fig
 
     #Bot Histogram
@@ -601,7 +606,7 @@ def main(param):
                 xanchor='right',
                 titleside='top'
             ),
-            line_width=0))
+            line_width=2))
 
     fig = go.Figure(data=[node_trace, edge_trace],
                 layout=go.Layout(
@@ -620,9 +625,23 @@ def main(param):
         fig.add_trace(go.Mesh3d(x = node_x, y = node_y, z = h, opacity= 0.3, name = bot))
     fig.update_traces(alphahull = -1, selector= dict(type = 'mesh3d'))
     fig.write_html('{}/{}_visit_count.html'.format(sim_dir, name))
-    fig.show()
+    # fig.show()
 
-    del fig, df1, df2, df3
+    del fig
+    
+    df = pd.read_csv(dirname + '/results_compiled.csv')
+    to_add = {}
+    to_add = config.copy()
+    to_add['max_idle'] = np.max(max_idle)
+    to_add['avg_idle'] = np.mean(avg_idle)
+    for col in to_add.keys():
+        if not col in df.columns:
+            df.reindex(columns = df.columns.tolist() + [col])
+    df = df.append(to_add, ignore_index = True)
+    df.to_csv(dirname + '/results_compiled.csv', index = False)
+    del df1, df2, df3, df
+
+
 
 
 if __name__ == '__main__':

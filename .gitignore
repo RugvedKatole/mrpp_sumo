@@ -1,3 +1,5 @@
-**/outputs
+outputs/*
 config/*
 !config/test.yaml
+*.csv
+post_process/*

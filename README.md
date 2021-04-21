@@ -79,6 +79,10 @@ Contains the sequence of visits excuted by the bots. 3 lines per visit (time_sta
 - *_vehicle.xml
 Output from SUMO file
 
+To generate plots use the sim_visualize.py script in ./scripts/post_process folder
+
+    python3 sim_visualize.py 'config_name'
+
 
 ## To Do
 - Add scripts to generate plots for analysis 
