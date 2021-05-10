@@ -8,7 +8,7 @@ import rospkg
 import numpy as np
 import rospy
 import networkx as nx
-from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse
+from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse, AlgoReady, AlgoReadyResponse
 from mrpp_sumo.msg import AtNode
 import random as rn
 
