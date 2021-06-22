@@ -26,18 +26,26 @@ pio.kaleido.scope.mathjax = None
 import rosparam
 import matplotlib.animation as anplot
 import matplotlib.pyplot as plt
+import os
 
 class Multi_Q:
 
-    def __init__(self, graph, time_period, num_threads, q_0 = 0.8, alpha = 0.1, gamma = 0.3, delta = 3, beta = 1, W = 10000):
+    def __init__(self, graph, time_period, num_threads, sim_dir, q_0 = 0.8, alpha = 0.1, gamma = 0.3, delta = 3, beta = 1, W = 10000):
         self.graph = graph.copy()
         self.edges_og = list(graph.edges())
         self.nodes = list(graph.nodes())
+        self.sim_dir = sim_dir
+        self.time_period = time_period
         self.paths = {}
         self.num_threads = min(num_threads, len(self.nodes))
         for i in self.nodes:
             for j in self.nodes:
-                if i != j and not (i, j) in self.edges_og:
+                if i == j and not (i, j) in self.graph.edges():
+                    self.graph.add_edge(i, j)
+                    self.graph[i][j]['name'] = '{}to{}'.format(i, j)
+                    self.graph[i][j]['length'] = self.time_period
+                    self.paths[(i, j)] = [i, j]
+                elif i != j and not (i, j) in self.edges_og:
                     self.graph.add_edge(i, j)
                     self.graph[i][j]['name'] = '{}to{}'.format(i, j)
                     self.graph[i][j]['length'] = nx.dijkstra_path_length(graph, i, j, 'length')
@@ -63,17 +71,13 @@ class Multi_Q:
         self.best_len = np.inf
         self.best_walk_directions = []
         self.best_walk_edges = []
-        self.time_period = time_period
+        self.robs = 0
         self.init_plot()    
-        # self.num_threads = self.nodes
-        # self.fig.show()
 
     def init_plot(self):
 
         d = 20 #radius of nodes
 
-        # edge_x = []
-        # edge_y = []
         self.edge_traces = [] 
         self.edges_plot = []
         for edge in self.edges_og:
@@ -102,9 +106,24 @@ class Multi_Q:
                 size=d,
                 line_width=0))
 
-        self.frames = [go.Frame(data=[self.node_trace] + self.edge_traces.copy())]
+        fig = go.Figure(data=[self.node_trace] + self.edge_traces,
+            layout=go.Layout(
+            title='Graph \'{}\''.format(graph_name),
+            title_x = 0.4,
+            # titlefont_size=16,
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(b=20,l=5,r=5,t=40),
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            plot_bgcolor='black'
+            # updatemenus=[dict(type="buttons", buttons=[dict(label="Play", method="animate", args=[None, {"frame": {"duration": 5, "redraw": True}}])])]),
+            # frames = test.frames
+            ))
+        fig.update_yaxes(scaleanchor = 'x', scaleratio = 1)
+        fig.to_image(format="png", engine="kaleido")
+        fig.write_image('{}/img_0.png'.format(self.sim_dir))
 
-        # return fig
     
     def run(self):
         actions = self.edges.copy()
@@ -112,11 +131,11 @@ class Multi_Q:
         out_degree = [False for n in self.nodes]
         edges_in_run = {}
 
-        while not (any(in_degree) and any(out_degree)):
+        while not (all(in_degree) and all(out_degree)):
             values = [(self.graph[act[0]][act[1]]['q_value'] ** self.delta) * (self.graph[act[0]][act[1]]['h_value'] ** self.beta) for act in actions]
-            # values = [self.graph[cur_node][node]['q_value'] for node in actions]
             tot_val = sum(values)
             values = [v/tot_val for v in values]
+
             if rn.random() <= self.q:
                 act = actions[np.argmax(values)]
 
@@ -149,12 +168,6 @@ class Multi_Q:
                 self.graph[act[0]][act[1]]['q_value'] *= (1 - self.alpha)
                 self.graph[act[0]][act[1]]['q_value'] += self.alpha * self.gamma * next_val 
 
-
-        # le = 0
-        # for i in range(len(self.nodes)):
-        #     # print(self.graph[walk_so_far[i]][walk_so_far[i + 1]]['length'])
-        #     le += self.graph[walk_so_far[i]][walk_so_far[i + 1]]['length']
-
         return (edges_in_run)
     
 
@@ -164,6 +177,7 @@ class Multi_Q:
         edge_lens = []
         cur_edges = []
         cur_len = 0
+        robots = 0
         nodes_rem = self.nodes.copy()
         while nodes_rem:
             if len(cur_edges) == 0:
@@ -172,43 +186,52 @@ class Multi_Q:
                 cur_node = cur_edges[-1][1]
                 cur_len += self.graph[cur_edges[-1][0]][cur_edges[-1][1]]['length'] 
             else:
-                nodes_rem.remove(cur_node)
-                cur_edges.append(remain_edges[cur_node])
-                cur_node = cur_edges[-1][-1]
-                cur_len += self.graph[cur_edges[-1][0]][cur_edges[-1][1]]['length']
                 if cur_node == start_node:
                     edge_sets.append(cur_edges)
                     edge_lens.append(cur_len)
                     cur_edges = []
+                    robots += np.ceil(cur_len/self.time_period)
                     cur_len = 0
-        return edge_sets, edge_lens
+                else:
+                    nodes_rem.remove(cur_node)
+                    cur_edges.append(remain_edges[cur_node])
+                    cur_node = cur_edges[-1][-1]
+                    cur_len += self.graph[cur_edges[-1][0]][cur_edges[-1][1]]['length']
+
+
+        return edge_sets, edge_lens, robots
 
     def episode(self, ep_count):
         walks = []
         lens = []
         costs = []
+        robs = []
         if ep_count > 100 and self.q < 0.99:
             self.q += (self.q_rem/2) ** 2
             self.q_rem = 1 - self.q 
 
         for i in range(self.num_threads):
-            # to be run as separate threads
+            #dictionary of node to outgoing edge
             edges_run = self.run()
-            # print(i, w, l)
-            es, ls = self.cost_of_walks(edges_run)
+
+            # print(ep_count, i, edges_run)
+            es, ls, rob = self.cost_of_walks(edges_run)
+
             cost = 0
             for c in ls:
-                cost += (c//self.time_period + 1)
+                cost += (np.ceil(c/self.time_period) * self.time_period - c) ** 2
+            cost += rob ** 2
             walks.append(es)
             lens.append(ls)
             costs.append(cost)
-
-
+            robs.append(rob)
 
         iter_best_walk = walks[np.argmin(costs)]
         iter_best = min(costs)
+        iter_best_count = robs[np.argmin(costs)]
         iter_best_edges = []
-        for w in range(len(iter_best_walk) - 1):
+        for w in iter_best_walk:
+            # if len(w) != 1:
             for a in w:
                 path = self.paths[(a[0], a[1])]
                 for j in range(len(path) - 1):
@@ -220,53 +243,68 @@ class Multi_Q:
             self.best_walk = iter_best_walk
             self.best_walk_directions = iter_best_edges
             self.best_walk_edges = []
-            for i in range(len(self.best_walk) - 1):
-                path = self.paths[(self.best_walk[i], self.best_walk[i + 1])]
-                for j in range(len(path) - 1):
-                    if (path[j], path[j + 1]) in self.edges_plot:
-                        self.best_walk_edges.append((path[j], path[j + 1]))
+            self.robs = iter_best_count
+            for i in self.best_walk_directions:
+                # path = self.paths[(self.best_walk[i], self.best_walk[i + 1])]
+                # for j in range(len(path) - 1):
+                    if i[0] == i[1]:
+                        pass
+                    elif i in self.edges_plot:
+                        self.best_walk_edges.append(i)
                     else:
-                        self.best_walk_edges.append((path[j + 1], path[j]))
-                    if (path[j], path[j + 1]) not in self.best_walk_directions:
-                        self.best_walk_directions.append((path[j], path[j + 1]))
+                        self.best_walk_edges.append((i[1], i[0]))
 
-        del_aq = self.W/iter_best
+        del_aq = self.W/(iter_best + 1)
         edge_counts = {tuple(e): 0 for e in self.edges_plot}
-        for w in walks:
-            for i in range(len(w) - 1):
-                self.graph[w[i]][w[i + 1]]['q_value'] =  self.graph[w[i]][w[i + 1]]['q_value'] + self.alpha * del_aq
-                path = self.paths[(w[i], w[i + 1])]
-                for j in range(len(path) - 1):
-                    if (path[j], path[j + 1]) in self.edges_plot:
-                        edge_counts[(path[j], path[j + 1])] += 1
-                    else:
-                        edge_counts[(path[j + 1], path[j])] += 1
+        for walk in walks:
+            for circuit in walk:
+                for e in circuit:
+                    self.graph[e[0]][e[1]]['q_value'] =  self.graph[e[0]][e[1]]['q_value'] + self.alpha * del_aq
+                    path = self.paths[e]
+                    for j in range(len(path) - 1):
+                        if path[j] == path[j + 1]:
+                            pass
+                        elif (path[j], path[j + 1]) in self.edges_plot:
+                            edge_counts[(path[j], path[j + 1])] += 1
+                        else:
+                            edge_counts[(path[j + 1], path[j])] += 1
+
+ 
+        if ep_count % 10 == 0:
+            max_count = max(list(edge_counts.values()))
+
+            edge_traces = self.edge_traces.copy()
 
 
-
-        edge_traces = self.edge_traces.copy()
-
-        # #test code
-        # for i in range(len(self.edges_plot)):
-        #     edge_traces[i].line.color = 'blue'
-        #     edge_traces[i].opacity = 1
-        #     if (ep_count) % 2 == 0:
-        #         edge_traces[i].line.color = 'orange'
-
-        for i in range(len(self.edges_plot)):
-            edge_traces[i].line.width = 1
-            edge_traces[i].line.color = 'white'
-            edge_traces[i].opacity = min(edge_counts[tuple(self.edges_plot[i])]/len(self.nodes), 1)
-            if tuple(self.edges_plot[i]) in self.best_walk_edges:
-                edge_traces[i].line.color = 'orange'
-                edge_traces[i].opacity = 1
+            for i in range(len(self.edges_plot)):
+                edge_traces[i].line.width = 1
+                edge_traces[i].line.color = 'white'
+                edge_traces[i].opacity = min(edge_counts[tuple(self.edges_plot[i])]/max_count, 1)
+                if tuple(self.edges_plot[i]) in self.best_walk_edges:
+                    edge_traces[i].line.color = 'orange'
+                    edge_traces[i].opacity = 1
                 edge_traces[i].line.width = 4
-        # if ep_count % 10 == 1:
-        frame = go.Frame(data=[self.node_trace] + edge_traces, 
-                        layout= go.Layout(title = 'Episode {}, Best Length = {}m'.format(ep_count, self.best_len), title_x = 0.4))
-        
-        self.frames.append(frame)   
-        return (iter_best_walk, iter_best)
+            
+            fig = go.Figure(data=[self.node_trace] + edge_traces,
+                layout=go.Layout(
+                title='Graph \'{}\', Episode - {}, Robots - {}'.format(graph_name, ep_count, self.robs),
+                title_x = 0.4,
+                # titlefont_size=16,
+                showlegend=False,
+                hovermode='closest',
+                margin=dict(b=20,l=5,r=5,t=40),
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                plot_bgcolor='black'
+                # updatemenus=[dict(type="buttons", buttons=[dict(label="Play", method="animate", args=[None, {"frame": {"duration": 5, "redraw": True}}])])]),
+                # frames = test.frames
+                ))
+            fig.update_yaxes(scaleanchor = 'x', scaleratio = 1)
+            fig.to_image(format="png", engine="kaleido")
+            fig.write_image('{}/img_{}.png'.format(self.sim_dir, int(ep_count//10)))
+
+        return (iter_best_edges, iter_best_count)
+
 
 
 if __name__ == '__main__':
@@ -275,11 +313,13 @@ if __name__ == '__main__':
 
     params = rosparam.load_file(sim_file)[0][0]
     graph_name = params['graph']
-    num_episodes = params['num_episodes']
-    num_threads = params['num_threads']
+    num_episodes = int(params['num_episodes'])
+    num_threads = int(params['num_threads'])
     algo = params['algo_name']
     sim_name = params['random_string']
-    time_period = params['time_period']
+    time_period = float(params['time_period'])
+    sim_dir = dirname + '/outputs/' + sim_name
+    os.mkdir(sim_dir)
 
     if algo != 'multi_q_tsp':
         print('Not this algorithm')
@@ -287,43 +327,20 @@ if __name__ == '__main__':
 
     g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
     
-    
-    # outputs = ant_q_tsp(g)
-
-    test = Multi_Q(g, time_period, num_threads)
-    # print(test.run('0'))
-    for i in range(num_episodes):
-        w, l = test.episode(i + 1)
-        # print(i, l)
-
-    fig = go.Figure(data=[test.node_trace] + test.edge_traces,
-            layout=go.Layout(
-            title='Graph \'{}\''.format(graph_name),
-            # titlefont_size=16,
-            showlegend=False,
-            hovermode='closest',
-            margin=dict(b=20,l=5,r=5,t=40),
-            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            plot_bgcolor='black',
-            updatemenus=[dict(type="buttons", buttons=[dict(label="Play", method="animate", args=[None, {"frame": {"duration": 5, "redraw": True}}])])]),
-            frames = test.frames
-            )
-    fig.update_yaxes(scaleanchor = 'x', scaleratio = 1)
-    fig.write_html('{}/{}_tsp.html'.format(dirname + '/outputs', sim_name))
-
-    # Writer = anplot.writers['ffmpeg']
-    # writer = Writer(fps=15, metadata=dict(artist='S Deepak Mallya'), bitrate=1800)
-
-    # ani = anplot.ArtistAnimation(plt.figure(), test.frames, interval=5, blit=True, repeat_delay=1000)
-    # ani.save(dirname + '/outputs/{}_video.mp4'.format(sim_name), writer = writer)
-
-    
-
-    best_walk = test.best_walk_directions
     with open(dirname + '/outputs/{}_visit_seq.in'.format(sim_name), 'w') as f:
-        f.write(str(test.best_len) + '\n')
+        test = Multi_Q(g, time_period, num_threads, sim_dir)
+        for i in range(num_episodes):
+
+            w, l = test.episode(i + 1)
+            print(i, l)
+            
+            f.write('Epsiode' + str(i + 1) + ': ' + str(l) + '\n')
+            f.write('\n')
+            for n in w:
+                f.write(str(n)+ '\n')
+            f.write('\n')
+
+        f.write('Minimum Cost: ' + str(test.best_len) + '\n')
         f.write('\n')
-        for n in best_walk:
-            f.write(str(n[0])+ '\n')
-        
+        for n in test.best_walk:
+            f.write(str(n)+ '\n')

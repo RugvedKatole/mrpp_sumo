@@ -85,11 +85,12 @@ def main(param):
             cur_data_n[n] = cur_time
         for e in df2.columns:
             cur_data_e[e] = cur_time
-
-        for l in f.readlines():
+        
+        for l in f:
             i += 1
+            print(i, cur_time)
             if i % 3 == 1:
-                next_time = float(l)
+                next_time = float(l.strip('\n'))
                 while cur_time < next_time:
                     df1 = df1.append(cur_data_n, ignore_index = True)
                     df2 = df2.append(cur_data_e, ignore_index = True)
@@ -131,9 +132,9 @@ def main(param):
     # plt.subplots(figsize = (10, 20))
     # plt.subplots_adjust(top= 0.2)
     # sns.set(rc = {'figure.figsize':(20, 100)})
-    sns.relplot(data= df1.loc[::100], kind='scatter')
+    sns.relplot(data= df1.loc[::1000], kind='scatter')
     plt.suptitle('Node Idleness Values vs Time', size = 18, y = 1.02, x = 0.4)
-    sns.lineplot(data = df1.iloc[::100], x = 'time', y = df1.loc[::100, nodes].mean(axis = 1), legend = False, linewidth = 3)
+    sns.lineplot(data = df1.iloc[::1000], x = 'time', y = df1.loc[::1000, nodes].mean(axis = 1), legend = False, linewidth = 3)
     plt.xticks(rotation = 30)
     plt.ylabel('Node Idleness')
 
@@ -774,7 +775,7 @@ def main(param):
     fig = plt.subplot()
 
     for bot in bot_visit_seq.keys():
-        mask = bot_visit_seq[bot]['time'] >= 15000
+        mask = bot_visit_seq[bot]['time'] >= 195000
         sns.scatterplot(data= bot_visit_seq[bot][mask], y = [int(bot.split('_')[1])] * bot_visit_seq[bot][mask].shape[0], x = 'time', style='node', hue='node', legend = False, palette= 'gist_stern')
     plt.suptitle('Node Visit Sequence vs Time', size = 18, y = 1.02, x = 0.4)
 
@@ -807,7 +808,7 @@ def main(param):
 
     #Adding to master data set
 
-    df = pd.read_csv(dirname + '/results_compiled.csv')
+    df = pd.read_csv(dirname + '/ledge.csv')
     to_add = {}
     to_add = config.copy()
     to_add['max_idle'] = np.max(max_idle)
@@ -817,7 +818,7 @@ def main(param):
             df.reindex(columns = df.columns.tolist() + [col])
     if not to_add['random_string'] in map(str, df['random_string']):
         df = df.append(to_add, ignore_index = True)
-    df.to_csv(dirname + '/results_compiled.csv', index = False)
+    df.to_csv(dirname + '/ledge.csv', index = False)
     del df1, df2, df3, df
 
 
