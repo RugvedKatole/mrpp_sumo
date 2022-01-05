@@ -28,6 +28,7 @@ import numpy as np
 
 
 def add_vertex_trail(graph, path, len_path, vertex, dest, len_max):
+    ''''''
     cur = path[-1]
     len_rem = nx.dijkstra_path_length(graph, cur, dest, weight = 'length')
     if (len_rem + len_path) > len_max:
@@ -44,8 +45,8 @@ def compute_valid_trails(graph, source, dest, len_max, folder):
         with open(folder + '/vp_temp_{}.in'.format(0), 'w') as f1:
             f1.write(str(source) + ' ' + str(0) + '\n')
 
-        count = 1
-        steps = 0
+        count = 1  #no of walks in vp temp
+        steps = 0   # iterations on vp temp
         while count != 0:
             count = 0
             with open(folder + '/vp_temp_{}.in'.format(steps), 'r') as f0:
@@ -70,11 +71,13 @@ def compute_valid_trails(graph, source, dest, len_max, folder):
                                     temp += ' ' + str(graph[path[-1]][v]['length'] + len_path)
                                     f1.write(temp + '\n')
             steps += 1
+            os.remove(folder + '/vp_temp_{}.in'.format(steps-1))
 
     for i in range(steps + 1):
         os.remove(folder + '/vp_temp_{}.in'.format(i))
 
 def all_valid_trails(graph, node_set, len_max, folder):
+    #suggestion using j in range(i+1,len(node_set)) might help reducing time complexity to n(n-1)/2, current time complexity is n^2
     for i in range(len(node_set)):
         for j in range(len(node_set)):
             compute_valid_trails(graph, node_set[i], node_set[j], len_max[i], folder)
@@ -82,30 +85,31 @@ def all_valid_trails(graph, node_set, len_max, folder):
 
 class TPBP:
 
-    def __init__(self, graph, priority_nodes, time_periods, coefficients, num_dummy_nodes, reshuffle_time, path_to_folder):
+    def __init__(self, graph, priority_nodes, time_periods, coefficients, path_to_folder):
+        '''Initializes class TPBP with required ros paramenters  i.e time periods,dummy nodes reshuffle time,etc '''
         self.ready = False
         rospy.Service('algo_ready', AlgoReady, self.callback_ready)
-        self.graph = graph
-        self.priority_nodes = priority_nodes
+        self.graph = graph          #assigning graph to self 
+        self.priority_nodes = priority_nodes     
         self.time_periods = time_periods
         self.coefficients = coefficients
-        self.offline_folder = path_to_folder
+        self.offline_folder = path_to_folder   #offline folder path to store valid walks
         for node in self.graph.nodes():
-            self.graph.nodes[node]['idleness'] = 0.
-        self.stamp = 0.
+            self.graph.nodes[node]['idleness'] = 0.     #adding a idleness parameter to nodes
+        self.stamp = 0.         #initializing time stamp to 0
 
-        self.num_dummy_nodes = num_dummy_nodes #Number of dummy nodes
-        self.reshuffle_time = reshuffle_time #Expected Time between reshuffles
-        self.dummy_time_period = [self.time_periods[0]] * self.num_dummy_nodes
-        self.time_periods.extend(self.dummy_time_period)        
+        #self.num_dummy_nodes = num_dummy_nodes #Number of dummy nodes
+        #self.reshuffle_time = reshuffle_time #Expected Time between reshuffles
+        #self.dummy_time_period = [self.time_periods[0]] * self.num_dummy_nodes
+        #self.time_periods.extend(self.dummy_time_period)        
         self.nodes = list(self.graph.nodes())
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]
-        self.dummy_nodes = np.random.choice(self.non_priority_nodes, self.num_dummy_nodes)
-        self.priority_nodes_cur = self.priority_nodes[:]
-        self.priority_nodes_cur.extend(self.dummy_nodes)
+        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  # all nodes which are not in priority nodes
+        #self.dummy_nodes = np.random.choice(self.non_priority_nodes, self.num_dummy_nodes) #selecting dummy nodes at random from non-priority nodes
+        self.priority_nodes_cur = self.priority_nodes[:]            #list of current priority nodes
+        #self.priority_nodes_cur.extend(self.dummy_nodes)            # adding dummy nodes to priority nodes list
         self.priority_nodes_prev = self.priority_nodes_cur[:]
-        self.reshuffle_next = np.random.poisson(self.reshuffle_time)
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes_cur]
+        #self.reshuffle_next = np.random.poisson(self.reshuffle_time)
+        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes_cur]  #choosing dummy nodes other than current
 
 
         self.assigned = []
@@ -117,14 +121,16 @@ class TPBP:
 
     def tpbp_offline(self):
         if not os.path.isdir(self.offline_folder):
+            '''creates a offline folder is not created already'''
             os.mkdir(self.offline_folder)
         n = len(list(self.graph.nodes()))
         s = len(self.priority_nodes)
         temp = self.time_periods.copy()
         for _ in range(n - s):
+            ''' assigning time periods to non priority nodes'''
             temp.append(self.time_periods[0])
         all_valid_trails(self.graph, list(self.graph.nodes()), temp, self.offline_folder)
-        time.sleep(1.)
+        time.sleep(1.)  #halts the exceution of code for 1 sec
         self.ready = True
 
     def tpbp_reward(self, walk):
@@ -134,7 +140,7 @@ class TPBP:
         for i in nodes:
             temp1 += self.graph.nodes[i]['idleness']
             if i in self.priority_nodes:
-                j = self.priority_nodes.index(i)
+                j = self.priority_nodes.index(i)    #returns index of i in list priority_nodes, i,j is node index pair
                 if not self.assigned[j]:
                     temp2 += max(self.graph.nodes[i]['idleness'] - self.time_periods[j], 0)
 
@@ -147,7 +153,6 @@ class TPBP:
                     if temp < dist:
                         dist = temp
                 temp3 += dist
-
         temp4 = 0
         for i in range(len(walk) - 1):
             temp4 += self.graph[walk[i]][walk[i + 1]]['length']
@@ -165,6 +170,7 @@ class TPBP:
                 self.graph.nodes[n]['idleness'] = 0.
 
         #Randomization Code
+        '''
         if self.stamp >= self.reshuffle_next:
             self.reshuffle_next = self.stamp + numpy.random.poisson(self.reshuffle_time)
             self.dummy_nodes = numpy.random.choice(self.non_priority_nodes, self.num_dummy_nodes)
@@ -178,7 +184,7 @@ class TPBP:
                 self.assigned[len(self.priority_nodes) + i] = False
                 if n in self.priority_nodes_prev:
                     n_prev = self.priority_nodes_prev.index(n)
-                    self.assigned[len(self.priority_nodes) + i] = self.assigned_prev[n_prev]
+                    self.assigned[len(self.priority_nodes) + i] = self.assigned_prev[n_prev]'''
 
     def callback_next_task(self, req):
         t = req.stamp
@@ -266,10 +272,10 @@ if __name__ == '__main__':
     time_periods = list(map(float, rospy.get_param('/time_periods').split(' ')))
     coefficients = list(map(float, rospy.get_param('/coefficients').split(' ')))
     folder = rospy.get_param('/random_string')
-    num_dummy_nodes = rospy.get_param('/num_dummy_nodes')
-    reshuffle_time = rospy.get_param('/reshuffle_time')
+    #num_dummy_nodes = rospy.get_param('/num_dummy_nodes')
+    #reshuffle_time = rospy.get_param('/reshuffle_time')
     path_to_folder = dirname + '/outputs/' + folder
-    s = TPBP(g, priority_nodes, time_periods, coefficients, num_dummy_nodes, reshuffle_time, path_to_folder)
+    s = TPBP(g, priority_nodes, time_periods, coefficients, path_to_folder)
 
     rospy.Subscriber('at_node', AtNode, s.callback_idle)
     rospy.Service('bot_next_task', NextTaskBot, s.callback_next_task)
