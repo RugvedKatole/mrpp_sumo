@@ -105,16 +105,16 @@ class TPBP:
         self.nodes = list(self.graph.nodes())
         self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  # all nodes which are not in priority nodes
         #self.dummy_nodes = np.random.choice(self.non_priority_nodes, self.num_dummy_nodes) #selecting dummy nodes at random from non-priority nodes
-        self.priority_nodes_cur = self.priority_nodes[:]            #list of current priority nodes
+        #self.priority_nodes_cur = self.priority_nodes[:]            #list of current priority nodes
         #self.priority_nodes_cur.extend(self.dummy_nodes)            # adding dummy nodes to priority nodes list
-        self.priority_nodes_prev = self.priority_nodes_cur[:]
+        #self.priority_nodes_prev = self.priority_nodes_cur[:]
         #self.reshuffle_next = np.random.poisson(self.reshuffle_time)
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes_cur]  #choosing dummy nodes other than current
+        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
 
 
         self.assigned = []
         self.non_priority_assigned = []
-        for _ in self.priority_nodes_cur:
+        for _ in self.priority_nodes:
             self.assigned.append(False)
 
         self.tpbp_offline()
@@ -194,19 +194,19 @@ class TPBP:
         if node in self.non_priority_assigned:
             self.non_priority_assigned.remove(node)
 
-        if node in self.priority_nodes_cur:
-            self.assigned[self.priority_nodes_cur.index(node)] = False
+        if node in self.priority_nodes:
+            self.assigned[self.priority_nodes.index(node)] = False
 
-        print (node, self.priority_nodes_cur, self.assigned)
+        print (node, self.priority_nodes, self.assigned)
 
         best_reward = -np.inf
         next_walk = []
 
         self.graph.nodes[node]['idleness'] = 0.
 
-        for j in range(len(self.priority_nodes_cur)):
+        for j in range(len(self.priority_nodes)):
             if not self.assigned[j]:
-                valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes_cur[j], str(int(self.time_periods[j])))
+                valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(int(self.time_periods[j])))
                 with open(self.offline_folder + valid_trails, 'r') as f:
                     count = 0
                     for line in f:
@@ -247,7 +247,7 @@ class TPBP:
             next_walk = nx.dijkstra_path(g, node, dest_node, 'length')
         
         else:
-            self.assigned[self.priority_nodes_cur.index(next_walk[-1])] = True
+            self.assigned[self.priority_nodes.index(next_walk[-1])] = True
 
         next_departs = [t] * (len(next_walk) - 1)
         
