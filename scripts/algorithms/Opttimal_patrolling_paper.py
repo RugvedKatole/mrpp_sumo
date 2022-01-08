@@ -13,9 +13,9 @@ import rospkg
 """we need DFS tour not justs search"""
 ''' add call back next task'''
 
-Graph_path = sys.argv[1]
-no_off_agents = int(sys.argv[2])
-graphML= nx.read_graphml(Graph_path)       #Reading the graphML file from the given input path
+#Graph_path = sys.argv[1]
+#no_off_agents = int(sys.argv[2])
+#graphML= nx.read_graphml(Graph_path)       #Reading the graphML file from the given input path
 
 def DFSUtil(Graph, v, visited):
     '''The helper Recursive Function for DFS traversel'''
@@ -27,8 +27,8 @@ def DFSUtil(Graph, v, visited):
     for neighbour in Graph.neighbors(v):
         if neighbour not in visited:
             visited = DFSUtil(Graph,neighbour, visited)
-    if visited[-1] != v:
-      visited.append(v)
+    #if visited[-1] != v:
+      #visited.append(v)
     return visited
 
 
@@ -100,7 +100,8 @@ class OPP:
     self.pis=pis
     self.stamp = 0
     rospy.Service('algo_ready', AlgoReady, self.callback_ready)
-    self.ready = False
+    self.ready = True
+    self.direction=np.ones(num_bots)
 
 
   def callback_ready(self, req):
@@ -116,16 +117,18 @@ class OPP:
     bot = req.name
     node_list = pis[int(bot.split('_')[-1])]
     '''add to and fro logic'''
-    direction=1
-    if direction==1:
+    if self.direction[int(bot.split('_')[-1])]==1:
       if node==node_list[-1]:
-        direction=-1
-      neigh=node_list[node_list.index(node)+1]
-    elif direction==-1:
-      if node==node_list[-1]:
-        direction=-1
-      neigh=node_list[node_list.index(node)+1]
-    neigh=node_list[node_list.index(node)+1]
+        self.direction[int(bot.split('_')[-1])]=-1
+        neigh=node_list[node_list.index(node)-1]
+      else:
+        neigh=node_list[node_list.index(node)+1]
+    elif self.direction[int(bot.split('_')[-1])]==-1:
+      if node==node_list[0]:
+        self.direction[int(bot.split('_')[-1])]=1
+        neigh=node_list[node_list.index(node)+1]
+      else:
+        neigh=node_list[node_list.index(node)-1]
     next_walk = [node, neigh]
     next_departs = [t]
     return NextTaskBotResponse(next_departs, next_walk)
@@ -138,9 +141,10 @@ if __name__ == '__main__':
   num_bots = int(rospy.get_param('/init_bots'))
   g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
   pis = optimal_partition(g,num_bots)
-  rospy.set_param('init_locations',[p[0] for p in pis].join(' '))
 
-  s=OPP(g,num_bots)
+  rospy.set_param('init_locations',' '.join([p[0] for p in pis]))
+
+  s=OPP(g,num_bots,pis)
 
   #rospy.Subscriber('at_node', AtNode, s.callback_idle)
   rospy.Service('bot_next_task', NextTaskBot, s.callback_next_task)
