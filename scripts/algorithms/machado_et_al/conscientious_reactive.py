@@ -70,7 +70,7 @@ class CR:
             return AlgoReadyResponse(False)
 
 if __name__ == '__main__':
-    rospy.init_node('cr', anonymous= True)
+    rospy.init_node('cr', anonymous= True)  #creates a node for connection
     dirname = rospkg.RosPack().get_path('mrpp_sumo')
     done = False
     graph_name = rospy.get_param('/graph')

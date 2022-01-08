@@ -54,8 +54,8 @@ if __name__ == '__main__':
         time.sleep(2.)
 
     #Adding Bots
-    init_bots = int(rospy.get_param('/init_bots'))
-    bot_locations = rospy.get_param('/init_locations').split(' ')
+    init_bots = int(rospy.get_param('/init_bots'))  #number of bots
+    bot_locations = rospy.get_param('/init_locations').split(' ')  #initial locations if any
     cur_bots = []
     for i in range(init_bots):
         if bot_locations == ['']:
