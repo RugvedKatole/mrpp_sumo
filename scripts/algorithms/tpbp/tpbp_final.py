@@ -12,7 +12,8 @@ ROS Parameters -
 6. reshuffle_time
 7. random_string  (folder name)
 '''
-
+'''todo
+'''
 import rospy
 import rospkg
 import networkx as nx
@@ -73,8 +74,8 @@ def compute_valid_trails(graph, source, dest, len_max, folder):
             steps += 1
             os.remove(folder + '/vp_temp_{}.in'.format(steps-1))
 
-    for i in range(steps + 1):
-        os.remove(folder + '/vp_temp_{}.in'.format(i))
+    #for i in range(steps + 1):
+    #    os.remove(folder + '/vp_temp_{}.in'.format(i))
 
 def all_valid_trails(graph, node_set, len_max, folder):
     #suggestion using j in range(i+1,len(node_set)) might help reducing time complexity to n(n-1)/2, current time complexity is n^2
@@ -123,13 +124,13 @@ class TPBP:
         if not os.path.isdir(self.offline_folder):
             '''creates a offline folder is not created already'''
             os.mkdir(self.offline_folder)
-        n = len(list(self.graph.nodes()))
+        #n = len(list(self.graph.nodes()))
         s = len(self.priority_nodes)
         temp = self.time_periods.copy()
-        for _ in range(n - s):
+        for _ in range(s):
             ''' assigning time periods to non priority nodes'''
             temp.append(self.time_periods[0])
-        all_valid_trails(self.graph, list(self.graph.nodes()), temp, self.offline_folder)
+        all_valid_trails(self.graph, self.priority_nodes, temp, self.offline_folder)
         time.sleep(1.)  #halts the exceution of code for 1 sec
         self.ready = True
 
@@ -256,7 +257,7 @@ class TPBP:
 
     def callback_ready(self, req):
         algo_name = req.algo
-        if algo_name == 'tpbp' and self.ready:
+        if algo_name == 'tpbp_final' and self.ready:
             return AlgoReadyResponse(True)
         else:
             return AlgoReadyResponse(False)
@@ -271,7 +272,8 @@ if __name__ == '__main__':
     priority_nodes = rospy.get_param('/priority_nodes').split(' ')
     time_periods = list(map(float, rospy.get_param('/time_periods').split(' ')))
     coefficients = list(map(float, rospy.get_param('/coefficients').split(' ')))
-    folder = rospy.get_param('/random_string')
+    #folder = rospy.get_param('/random_string')
+    folder = 'tpbp'
     #num_dummy_nodes = rospy.get_param('/num_dummy_nodes')
     #reshuffle_time = rospy.get_param('/reshuffle_time')
     path_to_folder = dirname + '/outputs/' + folder
