@@ -94,12 +94,14 @@ def optimal_partition(graphML,m):
 
 class OPP:
 
-  def __init__(self, g, num_bots,pis):
+  def __init__(self, g, num_bots):
+    rospy.Service('algo_ready', AlgoReady, self.callback_ready)
     self.graph=g
     self.num_bots = num_bots
-    self.pis=pis
+    self.ready=False
+    self.pis=optimal_partition(g,num_bots)
+    rospy.set_param('init_locations',' '.join([p[0] for p in self.pis]))
     self.stamp = 0
-    rospy.Service('algo_ready', AlgoReady, self.callback_ready)
     self.ready = True
     self.direction=np.ones(num_bots)
 
@@ -115,7 +117,7 @@ class OPP:
     node = req.node_done
     t = req.stamp
     bot = req.name
-    node_list = pis[int(bot.split('_')[-1])]
+    node_list = self.pis[int(bot.split('_')[-1])]
     '''add to and fro logic'''
     if self.direction[int(bot.split('_')[-1])]==1:
       if node==node_list[-1]:
@@ -140,15 +142,13 @@ if __name__ == '__main__':
   graph_name = rospy.get_param('/graph')
   num_bots = int(rospy.get_param('/init_bots'))
   g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
-  pis = optimal_partition(g,num_bots)
 
-  rospy.set_param('init_locations',' '.join([p[0] for p in pis]))
+  
 
-  s=OPP(g,num_bots,pis)
+  s=OPP(g,num_bots)
 
   #rospy.Subscriber('at_node', AtNode, s.callback_idle)
   rospy.Service('bot_next_task', NextTaskBot, s.callback_next_task)
-
   done = False
   while not done:
     done = rospy.get_param('/done')

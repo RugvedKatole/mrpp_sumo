@@ -8,7 +8,7 @@ import rosparam
 
 # missed = [175,169,163,157,151,115,109,103,55,49,43,37]
 dir_name = rospkg.RosPack().get_path('mrpp_sumo')
-config_files = glob.glob(dir_name + '/config/led*.yaml')
+config_files = glob.glob(dir_name + '/config/tpbp*.yaml')
 count = 0
 for conf in config_files:
 # for i in missed:

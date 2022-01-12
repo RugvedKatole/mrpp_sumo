@@ -5,9 +5,8 @@ init_locations: ''
 done: false
 sim_length: 20000
 random_string: test
-algo_name: random_mrpp
+algo_name: tpbp
 priority_nodes: '5 10 16 19 24'
 time_periods: '800 800 800 700 500'
 coefficients: '1 1 0.8 1.4'
-num_dummy_nodes: 4
-reshuffle_time: 50
+

@@ -42,11 +42,10 @@ def add_vertex_trail(graph, path, len_path, vertex, dest, len_max):
     return True
 
 def compute_valid_trails(graph, source, dest, len_max, folder):
-    if os.path.exists(folder + '/valid_trails_{}_{}_{}.in'.format(str(source), str(dest),str(int(len_max)))):
-        return
     with open(folder + '/valid_trails_{}_{}_{}.in'.format(str(source), str(dest),str(int(len_max))), 'w') as f:
         with open(folder + '/vp_temp_{}.in'.format(0), 'w') as f1:
             f1.write(str(source) + ' ' + str(0) + '\n')
+
         count = 1  #no of walks in vp temp
         steps = 0   # iterations on vp temp
         while count != 0:
