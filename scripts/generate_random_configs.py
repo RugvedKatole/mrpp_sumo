@@ -70,7 +70,7 @@ if __name__ == '__main__':
                         # f.write('num_threads: {}\n'.format(threads))
                         # f.write('max_bots: {}\n'.format(max_bots))
                         # f.write('random_string: {}{}\n'.format(random_string, i))
-                            f.write('random_string: tpbp_{}\n'.format(i))
+                            f.write('random_string: tpbp_{}_{}\n'.format(g,i))
                             f.write('algo_name: {}\n'.format(algo_name[0]))
                             f.write('coefficients: {}\n'.format(coeff))
                         print (i)
