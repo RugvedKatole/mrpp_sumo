@@ -29,7 +29,6 @@ import numpy as np
 
 
 def add_vertex_trail(graph, path, len_path, vertex, dest, len_max):
-    ''''''
     cur = path[-1]
     len_rem = nx.dijkstra_path_length(graph, cur, dest, weight = 'length')
     if (len_rem + len_path) > len_max:
@@ -74,7 +73,7 @@ def compute_valid_trails(graph, source, dest, len_max, folder):
                                     f1.write(temp + '\n')
             steps += 1
             os.remove(folder + '/vp_temp_{}.in'.format(steps-1))
-
+    os.remove(folder + '/vp_temp_{}.in'.format(steps))
     #for i in range(steps + 1):
     #    os.remove(folder + '/vp_temp_{}.in'.format(i))
 
@@ -270,12 +269,12 @@ if __name__ == '__main__':
     done = False
     graph_name = rospy.get_param('/graph')
     g = nx.read_graphml(dirname + '/graph_ml/' + graph_name + '.graphml')
-
+    algo_name=rospy.get_param('/algo_name')
     priority_nodes = rospy.get_param('/priority_nodes').split(' ')
     time_periods = list(map(float, rospy.get_param('/time_periods').split(' ')))
     coefficients = list(map(float, rospy.get_param('/coefficients').split(' ')))
     #folder = rospy.get_param('/random_string')
-    folder = 'tpbp'
+    folder = algo_name + graph_name
     #num_dummy_nodes = rospy.get_param('/num_dummy_nodes')
     #reshuffle_time = rospy.get_param('/reshuffle_time')
     path_to_folder = dirname + '/outputs/' + folder
