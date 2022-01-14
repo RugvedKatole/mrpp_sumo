@@ -232,7 +232,6 @@ class TPBP:
                         line3 = nx.dijkstra_path(self.graph, line2[-1], self.priority_nodes[j], weight='length')
                         if line2[-1] not in self.priority_nodes:
                             line2.extend(line3[1:])
-                            print('line2 after extension',line2)
                         r = self.tpbp_reward(line2)
                         if r > best_reward:
                             best_reward = r
