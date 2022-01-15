@@ -2,4 +2,5 @@ use_sim_time,sim_length,graph,algo_name,init_bots,init_locations,random_string,a
 True,20000,grid_5_5,tpbp_alt1,1,4,tpbp_alt1_grid_5_5_181,230.0781413494723,False,725,,,,,,24 21 17 4,80.0 80.0 80.0 80.0,1 10 0 0,5.0
 True,20000,grid_5_5,tpbp_final,1,7,tpbp_final_grid_5_5_1,302.62681331866816,False,3211,,,,,,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,
 True,20000,grid_5_5,tpbp_final,1,23,tpbp_final_grid_5_5_2,344.463866,False,3120,,,,,,23 20 4 3 17,60.0 60.0 60.0 60.0 60.0,1 10 0 0,
-True,20000,grid_5_5,tpbp_alt1,1,7,tpbp_alt1_grid_5_5_1,232.99655645040266,False,1337,,,,,,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,5.0
+True,20000,grid_5_5,tpbp_alt1,1,7,tpbp_alt1_grid_5_5_1,232.99655645040264,False,1337,,,,,,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,5.0
+True,20000,grid_5_5,tpbp_alt1,1,23,tpbp_alt1_grid_5_5_2,244.3504490449045,False,979,,,,,,23 20 4 3 17,60.0 60.0 60.0 60.0 60.0,1 10 0 0,5.0
