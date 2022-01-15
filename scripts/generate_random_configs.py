@@ -1,11 +1,3 @@
-#!/bin/usr/env python3
-
-'''
-A script to generate configs based on the parameters required
-
-Output:
-appropriate yaml files in config directory
-'''
 
 import networkx as nx
 import sys
@@ -18,18 +10,15 @@ if __name__ == '__main__':
     if len(sys.argv[1:]) == 0:
         graph_name = ['grid_5_5', 'iitb','cair']
         #graph_name = ['st_line']
-        multiplicity = 5
+        multiplicity = 3
         num_priority=[4,5,6]
-
         #alg_ids = [6, 7, 8, 9]
         algo_name = ['tpbp_final','tpbp_alt1']
         vel = 10.
         coeff=" ".join(['1','10','0','0'])
         # prior_nodes = ['0', '4', '20', '24']
         # min_tp = fn.compute_min_tp(graph, prior_nodes)/vel
-
         # min_tp = 40.
-
         # lambda_priors = [0.0]
         # len_walks = [40, 80, 120]
         # max_divisions = 10
@@ -42,20 +31,18 @@ if __name__ == '__main__':
         # discount_factors = [1]
         random_string  = 'tpbp'
         i = 0
-        for algo_name in algo_name:
-            if not os.path.isdir(dir_name+"/config/" + algo_name):
-                os.mkdir(dir_name+"/config/"+algo_name)
-            for g in graph_name:
-                for ib in init_bots:            #number of bots 1,2,3,4
-                    for _ in range(multiplicity):        # selectin a graph from 3 graphs
-                        for a in num_priority:
-                            graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
-                            i += 1
-                            prior_nodes = rn.sample(graph.nodes(), a)
-                            loc=rn.sample(prior_nodes,ib)
-                            min_tp=(fn.compute_min_tp(graph,prior_nodes))/vel
-
-                            with open(dir_name + '/config/' + algo_name + '/{}{}.yaml'.format(random_string, i), 'w') as f:
+        for _ in range(multiplicity):
+            for ib in init_bots:            #number of bots 1,2,3,4
+                for g in graph_name:        # selectin a graph from 3 graphs
+                    for a in num_priority:
+                        graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
+                        i += 1
+                        prior_nodes = rn.sample(graph.nodes(), a)
+                        loc=rn.sample(prior_nodes,ib)
+                        min_tp=(fn.compute_min_tp(graph,prior_nodes))/vel
+                        for algo in algo_name:
+                           
+                            with open(dir_name + '/config/' + algo + '/{}_{}.yaml'.format(algo, i), 'w') as f:
                                 f.write('use_sim_time: true\n')
                                 f.write('graph: {}\n'.format(g))
                                 f.write('init_bots: {}\n'.format(ib))
@@ -73,11 +60,12 @@ if __name__ == '__main__':
                             # f.write('num_threads: {}\n'.format(threads))
                             # f.write('max_bots: {}\n'.format(max_bots))
                             # f.write('random_string: {}{}\n'.format(random_string, i))
-                                f.write('random_string: {}_{}_{}\n'.format(algo_name, g,i))
-                                f.write('algo_name: {}\n'.format(algo_name))
+                                #f.write('random_string: tpbp_{}\n'.format(i))
+                                f.write('random_string: {}_{}_{}\n'.format(algo,g,i))
+                                f.write('algo_name: {}\n'.format(algo))
                                 f.write('coefficients: {}\n'.format(coeff))
-                                if algo_name == 'tpbp_alt1':
+                                if algo == 'tpbp_alt1':
                                     f.write('depth: 5')
-                            print (i)
+                        print (i)
     else:
         print ('Please pass the appropriate arguments')
