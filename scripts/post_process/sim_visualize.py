@@ -38,16 +38,16 @@ def main(param):
 
     #name of the yaml/output files
     name = param[0]
-
+    name = 'tpbp_alt1_grid_5_5_2'
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
-    shutil.copy('{}/config/{}.yaml'.format(dirname, name), sim_dir)
+    shutil.copy('{}/config/tpbp_alt1/{}.yaml'.format(dirname, 'tpbp_alt1_2'), sim_dir)
     shutil.copy('{}/outputs/{}_visits.in'.format(dirname, name), sim_dir)
     shutil.copy('{}/outputs/{}_command.in'.format(dirname, name), sim_dir)
     # # shutil.copy('{}/outputs/{}_vehicle.xml'.format(dirdata, name), sim_dir)
     
     #get config and parameters
-    with open('{}/config/{}.yaml'.format(dirname,name), 'r') as f:
+    with open('{}/config/tpbp_alt1/{}.yaml'.format(dirname,'tpbp_alt1_2'), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     # print(config)
 
@@ -808,7 +808,7 @@ def main(param):
 
     #Adding to master data set
 
-    df = pd.read_csv(dirname + '/ledge.csv')
+    df = pd.read_csv(dirname + '/tpbp.csv')
     to_add = {}
     to_add = config.copy()
     to_add['max_idle'] = np.max(max_idle)
@@ -818,7 +818,7 @@ def main(param):
             df.reindex(columns = df.columns.tolist() + [col])
     if not to_add['random_string'] in map(str, df['random_string']):
         df = df.append(to_add, ignore_index = True)
-    df.to_csv(dirname + '/ledge.csv', index = False)
+    df.to_csv(dirname + '/tpbp.csv', index = False)
     del df1, df2, df3, df
 
 

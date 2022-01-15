@@ -8,7 +8,7 @@ import os
 if __name__ == '__main__':
     dir_name = rospkg.RosPack().get_path('mrpp_sumo')
     if len(sys.argv[1:]) == 0:
-        graph_name = ['grid_5_5', 'iitb','cair']
+        graph_name = ['grid_5_5']
         #graph_name = ['st_line']
         multiplicity = 3
         num_priority=[4,5,6]

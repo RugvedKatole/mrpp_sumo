@@ -28,7 +28,7 @@ import random as rn
 import numpy as np
 
 
-def add_vertex_trail(graph, path, len_path, vertex, dest, len_max):
+def add_vertex_trail(graph, path, len_path, vertex, len_max):
     cur = path[-1]
     len_rem = nx.dijkstra_path_length(graph, cur, vertex, weight = 'length')
     if (len_rem + len_path) > len_max:
@@ -40,10 +40,10 @@ def add_vertex_trail(graph, path, len_path, vertex, dest, len_max):
             return False
     return True
 
-def compute_valid_trails(graph, source, dest, len_max, depth, folder):
+def compute_valid_trails(g,graph, source, len_max, depth, folder):
     #if os.path.exists(folder + '/depth_trails_{}_{}_{}.in'.format(str(source), str(dest),str(int(len_max)/10+1))):
     #    return
-    with open(folder + '/depth_trails_{}_{}_{}.in'.format(str(source), str(dest), str(depth)), 'w') as f:
+    with open(folder + '/depth_trails_{}_{}_{}.in'.format(str(g), str(source), str(depth)), 'w') as f:
         with open(folder + '/vp_temp_{}.in'.format(0), 'w') as f1:
             f1.write(str(source) + ' ' + str(0) + '\n')
         count = 1  #no of walks in vp temp
@@ -62,16 +62,16 @@ def compute_valid_trails(graph, source, dest, len_max, depth, folder):
 
                         for v in neigh:
                             ## VELOCITY is set to 10.m/s
-                            if add_vertex_trail(graph, path, len_path, v, dest, len_max * 10.):
+                            if add_vertex_trail(graph, path, len_path, v, len_max * 10.):
                                 temp = ' '.join(line1[:-1])
                                 temp = temp + ' ' + str(v)
-                                if v==dest:
-                                    f.write(temp + '\n')
-                                    continue
-                                else:
-                                    count += 1
-                                    temp += ' ' + str(graph[path[-1]][v]['length'] + len_path)
-                                    f1.write(temp + '\n')
+                                # if v==dest:
+                                #     #f.write(temp + '\n')
+                                #     continue
+                                # else:
+                                count += 1
+                                temp += ' ' + str(graph[path[-1]][v]['length'] + len_path)
+                                f1.write(temp + '\n')
             steps += 1
             if steps >= depth:
                 with open(folder + '/vp_temp_{}.in'.format(steps), 'r') as f0:
@@ -88,16 +88,15 @@ def compute_valid_trails(graph, source, dest, len_max, depth, folder):
     #for i in range(steps + 1):
     #    os.remove(folder + '/vp_temp_{}.in'.format(i))
 
-def all_valid_trails(graph, node_set, len_max, depth, folder):
+def all_valid_trails(graph, node_set, len_max, depth, folder,g):
     #suggestion using j in range(i+1,len(node_set)) might help reducing time complexity to n(n-1)/2, current time complexity is n^2
     for i in range(len(node_set)):
-        for j in range(len(node_set)):
-            compute_valid_trails(graph, node_set[i], node_set[j], len_max[i], depth, folder)
+        compute_valid_trails(g, graph, node_set[i], len_max[i], depth, folder)
 
 
 class TPBP:
 
-    def __init__(self, graph, priority_nodes, time_periods, coefficients, depth, path_to_folder):
+    def __init__(self, graph, priority_nodes, time_periods, coefficients, depth, path_to_folder,graph_name):
         '''Initializes class TPBP with required ros paramenters  i.e time periods,dummy nodes reshuffle time,etc '''
         self.ready = False
         rospy.Service('algo_ready', AlgoReady, self.callback_ready)
@@ -106,6 +105,7 @@ class TPBP:
         self.time_periods = time_periods
         self.coefficients = coefficients
         self.depth = depth
+        self.graph_name = graph_name
         self.offline_folder = path_to_folder   #offline folder path to store valid walks
         for node in self.graph.nodes():
             self.graph.nodes[node]['idleness'] = 0.     #adding a idleness parameter to nodes
@@ -116,13 +116,13 @@ class TPBP:
         #self.dummy_time_period = [self.time_periods[0]] * self.num_dummy_nodes
         #self.time_periods.extend(self.dummy_time_period)        
         self.nodes = list(self.graph.nodes())
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  # all nodes which are not in priority nodes
+        #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  # all nodes which are not in priority nodes
         #self.dummy_nodes = np.random.choice(self.non_priority_nodes, self.num_dummy_nodes) #selecting dummy nodes at random from non-priority nodes
         #self.priority_nodes_cur = self.priority_nodes[:]            #list of current priority nodes
         #self.priority_nodes_cur.extend(self.dummy_nodes)            # adding dummy nodes to priority nodes list
         #self.priority_nodes_prev = self.priority_nodes_cur[:]
         #self.reshuffle_next = np.random.poisson(self.reshuffle_time)
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
+        #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
 
 
         self.assigned = []
@@ -142,7 +142,7 @@ class TPBP:
         for _ in range(s):
             ''' assigning time periods to non priority nodes'''
             temp.append(self.time_periods[0])
-        all_valid_trails(self.graph, self.priority_nodes, temp, self.depth, self.offline_folder)
+        all_valid_trails(self.graph, self.priority_nodes, temp, self.depth, self.offline_folder, self.graph_name)
         time.sleep(1.)  #halts the exceution of code for 1 sec
         self.ready = True
 
@@ -206,8 +206,8 @@ class TPBP:
         node = req.node_done
 
 
-        if node in self.non_priority_assigned:
-            self.non_priority_assigned.remove(node)
+        #if node in self.non_priority_assigned:
+        #    self.non_priority_assigned.remove(node)
 
         if node in self.priority_nodes:
             self.assigned[self.priority_nodes.index(node)] = False
@@ -222,7 +222,7 @@ class TPBP:
         for j in range(len(self.priority_nodes)):
             if not self.assigned[j]:
                 '''211 kuch aur ayega'''
-                valid_trails = '/depth_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(self.depth))
+                valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
                 with open(self.offline_folder + valid_trails, 'r') as f:
                     count = 0
                     for line in f:
@@ -296,7 +296,7 @@ if __name__ == '__main__':
     #num_dummy_nodes = rospy.get_param('/num_dummy_nodes')
     #reshuffle_time = rospy.get_param('/reshuffle_time')
     path_to_folder = dirname + '/outputs/' + folder
-    s = TPBP(g, priority_nodes, time_periods, coefficients, depth, path_to_folder)
+    s = TPBP(g, priority_nodes, time_periods, coefficients, depth, path_to_folder,graph_name)
 
     rospy.Subscriber('at_node', AtNode, s.callback_idle)
     rospy.Service('bot_next_task', NextTaskBot, s.callback_next_task)
