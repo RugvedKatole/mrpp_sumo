@@ -38,16 +38,16 @@ def main(param):
 
     #name of the yaml/output files
     name = param[0]
-    name = 'tpbp_alt1_grid_5_5_2'
+    name = 'tpbp_util_grid_5_5_1'
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
-    shutil.copy('{}/config/tpbp_alt1/{}.yaml'.format(dirname, 'tpbp_alt1_2'), sim_dir)
+    shutil.copy('{}/config/tpbp_util/{}.yaml'.format(dirname, 'tpbp_util_1'), sim_dir)
     shutil.copy('{}/outputs/{}_visits.in'.format(dirname, name), sim_dir)
     shutil.copy('{}/outputs/{}_command.in'.format(dirname, name), sim_dir)
     # # shutil.copy('{}/outputs/{}_vehicle.xml'.format(dirdata, name), sim_dir)
     
     #get config and parameters
-    with open('{}/config/tpbp_alt1/{}.yaml'.format(dirname,'tpbp_alt1_2'), 'r') as f:
+    with open('{}/config/tpbp_util/{}.yaml'.format(dirname,'tpbp_util_1'), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     # print(config)
 
