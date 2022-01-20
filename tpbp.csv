@@ -1,6 +1,7 @@
 use_sim_time,sim_length,graph,algo_name,init_bots,init_locations,random_string,avg_idle,done,max_idle,priority_nodes,time_periods,coefficients,depth
 True,20000,grid_5_5,tpbp_final,1,7,tpbp_final_grid_5_5_1,302.626813318668,False,3211,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,
 True,20000,grid_5_5,tpbp_final,1,23,tpbp_final_grid_5_5_2,344.463866,False,3120,23 20 4 3 17,60.0 60.0 60.0 60.0 60.0,1 10 0 0,
-True,20000,grid_5_5,tpbp_alt1,1,7,tpbp_alt1_grid_5_5_1,232.996556450403,False,1337,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,5
-True,20000,grid_5_5,tpbp_alt1,1,23,tpbp_alt1_grid_5_5_2,244.350449044905,False,979,23 20 4 3 17,60.0 60.0 60.0 60.0 60.0,1 10 0 0,5
-True,20000,grid_5_5,tpbp_util,1,7,tpbp_util_grid_5_5_1,282.718429685937,False,1511,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,5
+True,20000,grid_5_5,tpbp_alt1,1,7,tpbp_alt1_grid_5_5_1,232.996556450403,False,1337,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,5.0
+True,20000,grid_5_5,tpbp_alt1,1,23,tpbp_alt1_grid_5_5_2,244.350449044905,False,979,23 20 4 3 17,60.0 60.0 60.0 60.0 60.0,1 10 0 0,5.0
+True,20000,grid_5_5,tpbp_util,1,7,tpbp_util_grid_5_5_1,282.718429685937,False,1511,22 9 7 12,60.0 60.0 60.0 60.0,1 10 0 0,5.0
+True,20000,grid_5_5,tpbp_util,1,23,tpbp_util_grid_5_5_2,319.43905562224893,False,1460,23 20 4 3 17,60.0 60.0 60.0 60.0 60.0,1 10 0 0,5.0

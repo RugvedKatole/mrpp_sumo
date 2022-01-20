@@ -113,8 +113,8 @@ class TPBP:
             self.graph.nodes[node]['idleness'] = 0.     #adding a idleness parameter to nodes
             self.graph.nodes[node]['future_visits'] = {}
         self.stamp = 0.         #initializing time stamp to 0
-        for edge in self.graph.edges():
-            self.graph[edge[0]][edge[1]]['duration'] = self.graph[edge[0]][edge[1]]['length']/self.v_max
+        # for edge in self.graph.edges():
+        #     self.graph[edge[0]][edge[1]]['duration'] = self.graph[edge[0]][edge[1]]['length']/self.v_max
         #self.num_dummy_nodes = num_dummy_nodes #Number of dummy nodes
         #self.reshuffle_time = reshuffle_time #Expected Time between reshuffles
         #self.dummy_time_period = [self.time_periods[0]] * self.num_dummy_nodes
@@ -196,7 +196,7 @@ class TPBP:
         for t,i in enumerate(walk):
             # flag=False
             if future_visit_final[i] > n[t]:
-                print("1st conditoon")
+                # print("1st conditoon")
                 reward += 0
             # for j in future_visit_final:
             #     if n[t] < j:
@@ -204,14 +204,15 @@ class TPBP:
             #         flag=True
             #         break
             # if not flag:
-            if i not in self.priority_nodes:
-                reward += self.graph.nodes[i]['idleness'] + n[t]
-            elif i in self.priority_nodes:
+            else:
+                #reward += self.graph.nodes[i]['idleness'] + n[t]
+                reward += n[t] - future_visit_final[i]
+            if i in self.priority_nodes:
                 # for j in self.graph.nodes[i]['future_visits'].values():
-                if n[t] + self.graph.nodes[i]['idleness'] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
-                    reward += (self.coefficients[1]+1)*(self.graph.nodes[i]['idleness']+n[t])
+                if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
+                    reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
                 else:
-                    reward += n[t] + self.graph.nodes[i]['idleness'] + self.coefficients[1]*self.time_periods[0]
+                    reward += self.coefficients[1]*self.time_periods[0]
         return reward  
 
 
@@ -231,16 +232,6 @@ class TPBP:
                     if self.graph.nodes[n]['future_visits'][data.robot_id[i]] < 0.:
                         self.graph.nodes[n]['future_visits'].pop(data.robot_id[i])
 
-            for i, r in enumerate(data.robot_id):
-                if r not in self.robots.keys():
-                    self.robots[r] = (data.node_id[i], s.stamp)
-                elif self.robots[r][0] == data.node_id[i]:
-                    self.robots[r] = (data.node_id[i], self.stamp)
-                else:
-                    last_delta = self.stamp - self.robots[r][1]
-                    # self.graph[self.robots[r][0]][data.node_id[i]]['duration'] = (1 - self.alpha_dur) * self.graph[self.robots[r][0]][data.node_id[i]]['duration'] + self.alpha_dur * last_delta
-                    self.graph[self.robots[r][0]][data.node_id[i]]['duration'] = self.graph[self.robots[r][0]][data.node_id[i]]['duration'] +  last_delta                    
-                    self.robots[r] = (data.node_id[i], self.stamp)
 
         #Randomization Code
         '''
