@@ -104,17 +104,17 @@ class TPBP:
         #self.dummy_time_period = [self.time_periods[0]] * self.num_dummy_nodes
         #self.time_periods.extend(self.dummy_time_period)        
         self.nodes = list(self.graph.nodes())
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  # all nodes which are not in priority nodes
+        #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  # all nodes which are not in priority nodes
         #self.dummy_nodes = np.random.choice(self.non_priority_nodes, self.num_dummy_nodes) #selecting dummy nodes at random from non-priority nodes
         #self.priority_nodes_cur = self.priority_nodes[:]            #list of current priority nodes
         #self.priority_nodes_cur.extend(self.dummy_nodes)            # adding dummy nodes to priority nodes list
         #self.priority_nodes_prev = self.priority_nodes_cur[:]
         #self.reshuffle_next = np.random.poisson(self.reshuffle_time)
-        self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
+        #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
 
 
         self.assigned = []
-        self.non_priority_assigned = []
+        #elf.non_priority_assigned = []
         for _ in self.priority_nodes:
             self.assigned.append(False)
 
@@ -207,7 +207,6 @@ class TPBP:
 
         for j in range(len(self.priority_nodes)):
             if not self.assigned[j]:
-                '''211 kuch aur ayega'''
                 valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(int(self.time_periods[j])))
                 with open(self.offline_folder + valid_trails, 'r') as f:
                     count = 0
