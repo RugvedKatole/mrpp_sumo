@@ -111,7 +111,7 @@ class TPBP:
         #self.priority_nodes_prev = self.priority_nodes_cur[:]
         #self.reshuffle_next = np.random.poisson(self.reshuffle_time)
         #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
-
+        self.count21=0
 
         self.assigned = []
         #elf.non_priority_assigned = []
@@ -192,13 +192,14 @@ class TPBP:
         node = req.node_done
 
 
-        if node in self.non_priority_assigned:
-            self.non_priority_assigned.remove(node)
+        #if node in self.non_priority_assigned:
+            #self.non_priority_assigned.remove(node)
 
         if node in self.priority_nodes:
             self.assigned[self.priority_nodes.index(node)] = False
 
-        print (node, self.priority_nodes, self.assigned)
+        #print (node, self.priority_nodes, self.assigned)
+        print(self.count21)
 
         best_reward = -np.inf
         next_walk = []
@@ -218,6 +219,8 @@ class TPBP:
                         if r > best_reward:
                             best_reward = r
                             next_walk = line2
+        if next_walk[-1]=="21":
+            self.count21 +=1
         '''
         if all(self.assigned):
             print ('alive')

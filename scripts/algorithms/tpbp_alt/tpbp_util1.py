@@ -72,7 +72,7 @@ def compute_valid_trails(g,graph, source, len_max, depth, folder):
                                 temp += ' ' + str(graph[path[-1]][v]['length'] + len_path)
                                 f1.write(temp + '\n')
             steps += 1
-            if steps >= depth:
+            if steps > depth:
                 with open(folder + '/vp_temp_{}.in'.format(steps), 'r') as f0:
                     for line in f0:
                         line1 = line.split('\n')
@@ -82,8 +82,8 @@ def compute_valid_trails(g,graph, source, len_max, depth, folder):
                         f.write(path+'\n')
                         
                 break
-            os.remove(folder + '/vp_temp_{}.in'.format(steps-1))
-    os.remove(folder + '/vp_temp_{}.in'.format(steps))
+            # os.remove(folder + '/vp_temp_{}.in'.format(steps-1))
+    # os.remove(folder + '/vp_temp_{}.in'.format(steps))
     #for i in range(steps + 1):
     #    os.remove(folder + '/vp_temp_{}.in'.format(i))
 

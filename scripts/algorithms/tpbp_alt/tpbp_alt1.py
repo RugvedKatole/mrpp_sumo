@@ -14,6 +14,7 @@ ROS Parameters -
 '''
 '''todo
 '''
+from ast import walk
 import rospy
 import rospkg
 import networkx as nx
@@ -28,10 +29,10 @@ import random as rn
 import numpy as np
 
 
-def add_vertex_trail(graph, path, len_path, vertex, len_max):
+def add_vertex_trail(graph, path, len_path, vertex, depth):
     cur = path[-1]
     len_rem = nx.dijkstra_path_length(graph, cur, vertex, weight = 'length')
-    if (len_rem + len_path) > len_max:
+    if (len_rem + len_path)/100 > depth:
         return False
     if not cur in path[:-1]:
         return True
@@ -62,7 +63,7 @@ def compute_valid_trails(g,graph, source, len_max, depth, folder):
 
                         for v in neigh:
                             ## VELOCITY is set to 10.m/s
-                            if add_vertex_trail(graph, path, len_path, v, len_max * 10.):
+                            if add_vertex_trail(graph, path, len_path, v, depth):
                                 temp = ' '.join(line1[:-1])
                                 temp = temp + ' ' + str(v)
                                 # if v==dest:
@@ -73,7 +74,7 @@ def compute_valid_trails(g,graph, source, len_max, depth, folder):
                                 temp += ' ' + str(graph[path[-1]][v]['length'] + len_path)
                                 f1.write(temp + '\n')
             steps += 1
-            if steps >= depth:
+            if steps >=depth:
                 with open(folder + '/vp_temp_{}.in'.format(steps), 'r') as f0:
                     for line in f0:
                         line1 = line.split('\n')
@@ -268,7 +269,7 @@ class TPBP:
             self.assigned[self.priority_nodes.index(next_walk[-1])] = True'''
 
         next_departs = [t] * (len(next_walk) - 1)
-        
+        print(next_departs,next_walk)
         return NextTaskBotResponse(next_departs, next_walk)
 
 
