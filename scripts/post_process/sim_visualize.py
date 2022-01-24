@@ -55,6 +55,8 @@ def main(param):
     graph = nx.read_graphml(dirname + '/graph_ml/{}.graphml'.format(config['graph']))
     nodes = list(graph.nodes())
     edges = [graph[e[0]][e[1]]['name'] for e in list(graph.edges())]
+    priority_nodes = config['priority_nodes'].split(' ')
+    time_period = config['time_periods'].split(' ')
     n = len(nodes)
     num_bots = int(config['init_bots'])
     sim_length = int(config['sim_length'])
@@ -70,6 +72,8 @@ def main(param):
     df2 = pd.DataFrame(columns = cols_e)
     df3 = pd.DataFrame(columns = nodes, index = ['bot_{}'.format(i) for i in range(num_bots)])
     df3 = df3.fillna(0)         
+    df4 = pd.DataFrame(columns = cols_n)
+
 
     bot_visit_seq = {}
     for bot in range(num_bots):
@@ -82,10 +86,14 @@ def main(param):
         cur_time = 0
         cur_data_n = {}
         cur_data_e = {}
+        cur_over_n = {}
         for n in df1.columns:
             cur_data_n[n] = cur_time
         for e in df2.columns:
             cur_data_e[e] = cur_time
+        for j in df4.columns:
+            cur_over_n[j] = cur_time 
+
         
         for l in f:
             i += 1
@@ -95,16 +103,21 @@ def main(param):
                 while cur_time < next_time:
                     df1 = df1.append(cur_data_n, ignore_index = True)
                     df2 = df2.append(cur_data_e, ignore_index = True)
+                    df4 = df4.append(cur_over_n, ignore_index = True)
                     cur_time += 1
                     cur_data_n['time'] = cur_time
                     cur_data_e['time'] = cur_time
                     for n in nodes:
                         cur_data_n[n] += 1
+                        cur_over_n[n] = max((cur_data_n[n]-float(time_period[0])),0)
+
                     
             elif i % 3 == 2:
                 cur_nodes = l.strip('\n').split(' ')
                 for n in cur_nodes:
                     cur_data_n[n] = 0
+                    cur_over_n[n] = 0
+
             else:
                 cur_robots = l.strip('\n').split(' ')
                 for r in range(len(cur_robots)):
@@ -121,10 +134,12 @@ def main(param):
                             pass
     df1 = df1.set_index('time')
     df2 = df2.set_index('time')
+    df4 = df4.set_index('time')
 
     df1.to_csv(sim_dir + '/{}_node.csv'.format(name), index = False)
     df2.to_csv(sim_dir + '/{}_edge.csv'.format(name), index = False)
     df3.to_csv(sim_dir + '/{}_bot.csv'.format(name), index = False)
+    df4.to_csv(sim_dir + '/{}_Overshoot.csv'.format(name), index = False)
     
     #scatter plot of instantaneous idleness
     plt.figure()
@@ -164,10 +179,15 @@ def main(param):
 
     node_x = []
     node_y = []
+    node_x_priority= []
+    node_y_priority= []
     avg_idle = []
     max_idle = []
     for node in graph.nodes():
         x, y = graph.nodes[node]['x'], graph.nodes[node]['y']
+        if node in priority_nodes:
+            node_x_priority.append(x)
+            node_y_priority.append(y)
         node_x.append(x)
         node_y.append(y)
         avg_idle.append(df1[node].mean())
@@ -273,6 +293,137 @@ def main(param):
     # print('here')
     del fig
 
+#Plot Priority nodes on graph
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers',
+        hoverinfo='text',
+        marker=dict(
+            showscale=False,
+            # colorscale options
+            #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
+            #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
+            #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
+            colorscale='Blues',
+            reversescale=False,
+            color=[],
+            size=2 * d,
+            # opacity = 0.5,
+            # showscale = False,
+            # colorbar=dict(
+            #     thickness=15,
+            #     title='Node Connections',
+            #     xanchor='left',
+            #     titleside='right'
+            # ),
+            line_width=0))
+    node_trace1 = go.Scatter(
+    x=node_x_priority, y=node_y_priority,
+    mode='markers',
+    hoverinfo='text',
+    marker=dict(
+        showscale=False,
+        # colorscale options
+        #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
+        #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
+        #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
+        colorscale='Reds',
+        reversescale=False,
+        color=1,
+        size=2 * d,
+        # opacity = 0.5,
+        # showscale = False,
+        # colorbar=dict(
+        #     thickness=15,
+        #     title='Node Connections',
+        #     xanchor='left',
+        #     titleside='right'
+        # ),
+        line_width=0))
+
+    fig = go.Figure(data=[node_trace,node_trace1],
+                layout=go.Layout(
+                # title='Graph \'{}\''.format(config['graph']),
+                # titlefont_size=16,
+                showlegend=False,
+                hovermode='closest',
+                margin=dict(b=20,l=5,r=0,t=40),
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False), 
+                width=1200,
+                height=1000)
+                )
+
+    # fig.add_trace(go.Heatmap(x = node_x, y = node_y, z = node_z))
+    for i in range(0, len(edge_x), 3):
+        # print (edge_x[i])
+        x1 = edge_x[i + 1]  # arrows' head
+        y1 = edge_y[i + 1]  # arrows' head
+        x0 = edge_x[i]  # arrows' tail
+        y0 = edge_y[i]  # arrows' tail
+        # print (x0, y0, x1, y1)
+
+        vert = True
+        if x0 != x1:
+            m = (y1 - y0)/(x1 - x0)
+            c = y0 - m * x0
+            vert = False
+        
+        if vert:
+            yt = y0 + s * np.sign(y1 - y0)
+            yh = y1 - s * np.sign(y1 - y0)
+            xt = x0
+            xh = x1
+        else:
+            if y1 == y0:
+                xt = x0 + s * np.sign(x1 - x0)
+                xh = x1 - s * np.sign(x1 - x0)
+                yt = y0
+                yh = y1
+            else:
+                xt = x0 + math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                xh = x1 - math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                yt = m * xt + c
+                yh = m * xh + c
+        
+
+        fig.add_annotation(
+            x=xh,  # arrows' head
+            y=yh,  # arrows' head
+            ax=xt,  # arrows' tail
+            ay=yt,  # arrows' tail
+            xref='x',
+            yref='y',
+            axref='x',
+            ayref='y',
+            text='',  # if you want only the arrow
+            showarrow=True,
+            arrowhead=1,
+            arrowsize=2,
+            arrowwidth=1,
+            arrowcolor='black'
+            )
+    fig.update_yaxes(
+        scaleanchor = "x",
+        scaleratio = 1,
+    )
+    fig.update_layout(title_text='Priority Node Loctions', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
+    fig.to_image(format="png", engine="kaleido")
+    fig.write_image('/home/leo/Thesis/Test.png')
+    # fig.show()
+    del fig
+
+    #idleness overshoot
+    df5 = df4.groupby(nodes).count()
+    df5.to_csv(sim_dir + '/{}_frequency.csv'.format(name), index = False)
+
+
+        
+
+    
+    
+    
+    
     #color map of average idleness
     avg_trace = go.Scatter(
         x=node_x, y=node_y,
