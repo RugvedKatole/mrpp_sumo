@@ -418,21 +418,21 @@ def main(param):
     for n in df4.columns:
         idleness_over.append(df4[n].value_counts()[1])
     def idleness_spatial():
-        node_trace = go.Scatter(
+        node_trace2 = go.Scatter(
         x=node_x, y=node_y,
         mode='markers',
         hoverinfo='text',
         marker=dict(
-            showscale=False,
+            showscale=True,
             # colorscale options
             #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
             #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
             #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
-            colorscale='Blues',
+            colorscale='Blackbody',
             reversescale=False,
-            color=idleness_over,
+            color=[],
             size=2 * d,
-            # opacity = 0.5,
+            opacity = 0.2,
             # showscale = False,
             # colorbar=dict(
             #     thickness=15,
@@ -441,7 +441,32 @@ def main(param):
             #     titleside='right'
             # ),
             line_width=0))
-        fig = go.Figure(data=[node_trace],
+
+        node_trace3 = go.Scatter(
+        x=node_x_priority, y=node_y_priority,
+        mode='markers',
+        hoverinfo='text',
+        marker=dict(
+            showscale=True,
+            # colorscale options
+            #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
+            #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
+            #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
+            colorscale='Bluered',
+            reversescale=False,
+            color=idleness_over,
+            size=2 * d,
+            opacity = 1,
+            # showscale = False,
+            # colorbar=dict(
+            #     thickness=15,
+            #     title='Node Connections',
+            #     xanchor='left',
+            #     titleside='right'
+            # ),
+            line_width=0))
+
+        fig = go.Figure(data=[node_trace2,node_trace3],
                 layout=go.Layout(
                 # title='Graph \'{}\''.format(config['graph']),
                 # titlefont_size=16,
@@ -507,10 +532,10 @@ def main(param):
             scaleanchor = "x",
             scaleratio = 1,
         )
-        fig.update_layout(title_text='Priority Node Loctions', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
+        fig.update_layout(title_text='Overshoot frequency', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
         fig.to_image(format="png", engine="kaleido")
-        fig.write_image('{}/{}_avg_idle.png'.format(sim_dir, name))
-        del fig    
+        fig.write_image('/home/leo/Thesis/mrpp_sumo/src/post_process/tpbp_final_1/tpbp_final_Overshoot_frequency.png')
+        del fig     
     
     idleness_spatial()
 
