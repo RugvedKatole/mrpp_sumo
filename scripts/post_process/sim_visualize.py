@@ -414,9 +414,105 @@ def main(param):
     del fig
 
     #idleness overshoot
-    df5 = df4.groupby(nodes).count()
-    df5.to_csv(sim_dir + '/{}_frequency.csv'.format(name), index = False)
+    idleness_over=[]
+    for n in df4.columns:
+        idleness_over.append(df4[n].value_counts()[1])
+    def idleness_spatial():
+        node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers',
+        hoverinfo='text',
+        marker=dict(
+            showscale=False,
+            # colorscale options
+            #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
+            #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
+            #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
+            colorscale='Blues',
+            reversescale=False,
+            color=idleness_over,
+            size=2 * d,
+            # opacity = 0.5,
+            # showscale = False,
+            # colorbar=dict(
+            #     thickness=15,
+            #     title='Node Connections',
+            #     xanchor='left',
+            #     titleside='right'
+            # ),
+            line_width=0))
+        fig = go.Figure(data=[node_trace],
+                layout=go.Layout(
+                # title='Graph \'{}\''.format(config['graph']),
+                # titlefont_size=16,
+                showlegend=False,
+                hovermode='closest',
+                margin=dict(b=20,l=5,r=0,t=40),
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False), 
+                width=1200,
+                height=1000)
+                )
 
+        # fig.add_trace(go.Heatmap(x = node_x, y = node_y, z = node_z))
+        for i in range(0, len(edge_x), 3):
+            # print (edge_x[i])
+            x1 = edge_x[i + 1]  # arrows' head
+            y1 = edge_y[i + 1]  # arrows' head
+            x0 = edge_x[i]  # arrows' tail
+            y0 = edge_y[i]  # arrows' tail
+            # print (x0, y0, x1, y1)
+
+            vert = True
+            if x0 != x1:
+                m = (y1 - y0)/(x1 - x0)
+                c = y0 - m * x0
+                vert = False
+            
+            if vert:
+                yt = y0 + s * np.sign(y1 - y0)
+                yh = y1 - s * np.sign(y1 - y0)
+                xt = x0
+                xh = x1
+            else:
+                if y1 == y0:
+                    xt = x0 + s * np.sign(x1 - x0)
+                    xh = x1 - s * np.sign(x1 - x0)
+                    yt = y0
+                    yh = y1
+                else:
+                    xt = x0 + math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                    xh = x1 - math.sqrt(s ** 2 / (m ** 2 + 1)) * np.sign(x1 - x0)
+                    yt = m * xt + c
+                    yh = m * xh + c
+            
+
+            fig.add_annotation(
+                x=xh,  # arrows' head
+                y=yh,  # arrows' head
+                ax=xt,  # arrows' tail
+                ay=yt,  # arrows' tail
+                xref='x',
+                yref='y',
+                axref='x',
+                ayref='y',
+                text='',  # if you want only the arrow
+                showarrow=True,
+                arrowhead=1,
+                arrowsize=2,
+                arrowwidth=1,
+                arrowcolor='black'
+                )
+        fig.update_yaxes(
+            scaleanchor = "x",
+            scaleratio = 1,
+        )
+        fig.update_layout(title_text='Priority Node Loctions', title_x=0.5, titlefont_size = 20, plot_bgcolor = 'rgba(0, 0, 0, 0)')
+        fig.to_image(format="png", engine="kaleido")
+        fig.write_image('{}/{}_avg_idle.png'.format(sim_dir, name))
+        del fig    
+    
+    idleness_spatial()
 
         
 
@@ -956,7 +1052,35 @@ def main(param):
     # print ('here')
 
 
+    #Overshoot temporal plot
+    over = dict(zip(nodes,idleness_over))
+    non_p_over = []
+    pri_nod_over = []
+    for i in over.keys():
+        if i in priority_nodes:
+            pri_nod_over.append(over[i])
+        else:
+            non_p_over.append(over[i])
 
+    non_priority_nodes = [u for u in graph.nodes if u not in priority_nodes]
+    priority_nodes=list(map(int,priority_nodes))
+    non_priority_nodes = list(map(int,non_priority_nodes))
+
+
+    plt.figure()
+    # sns.set_style('white')
+    # sns.set_context(font_scale= 1, rc = {"font.size" : 15, "axes.titlesize" : 20})
+    # plt.subplots(figsize = (20, 20))
+    # plt.subplots(figsize = (10, 20))
+    # plt.subplots_adjust(top= 0.2)
+    # sns.set(rc = {'figure.figsize':(20, 100)})
+    # sns.relplot(data=non_p, kind='scatter')
+    # sns.relplot(data=pri_no, kind='scatter')
+    plt.scatter(non_priority_nodes,non_p_over,c="blue")
+    plt.scatter(priority_nodes,pri_nod_over,c="red")
+    plt.suptitle('Overshoot frequency vs nodes', size = 18, y = 1.02, x = 0.4)
+    plt.xticks(rotation = 30)
+    plt.ylabel('Node Idleness')
 
     #Adding to master data set
 
