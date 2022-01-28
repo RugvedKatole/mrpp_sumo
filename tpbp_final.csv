@@ -1,0 +1,2 @@
+use_sim_time,sim_length,graph,algo_name,init_bots,init_locations,random_string,avg_idle,done,max_idle,priority_nodes,time_periods,coefficients,depth,overshoot_avg,overshoot_max
+True,20000,grid_5_5,tpbp_final,1,20,tpbp_final_grid_5_5_1,302.62681331866816,False,3211,0 20 21 6,80.0 80.0 80.0 80.0,1 10 0 0,,0.8527625,0.9515

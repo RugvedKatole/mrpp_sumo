@@ -150,7 +150,7 @@ def main(param):
     # sns.set(rc = {'figure.figsize':(20, 100)})
     sns.relplot(data= df1.loc[::1000], kind='scatter')
     plt.suptitle('Node Idleness Values vs Time', size = 18, y = 1.02, x = 0.4)
-    sns.lineplot(data = df1.iloc[::1000], x = 'time', y = df1.loc[::1000, nodes].mean(axis = 1), legend = False, linewidth = 3)
+    sns.lineplot(data = df1.iloc[::1000], x = 'time', y = df1.loc[::1000, priority_nodes].mean(axis = 1), legend = False, linewidth = 3)
     plt.xticks(rotation = 30)
     plt.ylabel('Node Idleness')
 
@@ -1111,12 +1111,19 @@ def main(param):
 
 
     #Adding to master data set
+    df4[df4>0]=1
+    overshoot_ratio=[]
+    for n in priority_nodes:
+        overshoot_ratio.append(df4[n].sum()/sim_length)
+
 
     df = pd.read_csv(dirname + '/tpbp.csv')
     to_add = {}
     to_add = config.copy()
     to_add['max_idle'] = np.max(max_idle)
     to_add['avg_idle'] = np.mean(avg_idle)
+    to_add['overshoot_avg'] = np.mean(overshoot_ratio)
+    to_add['overshoot_max'] = np.max(overshoot_ratio)
     for col in to_add.keys():
         if not col in df.columns:
             df.reindex(columns = df.columns.tolist() + [col])
