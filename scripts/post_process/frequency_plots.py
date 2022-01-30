@@ -1,3 +1,4 @@
+from turtle import color
 import seaborn as sns
 import networkx as nx
 import plotly.graph_objects as go
@@ -29,27 +30,37 @@ def main(param):
     priority_nodes = config['priority_nodes'].split(' ')
     time_period = config['time_periods'].split(' ')
     n = len(nodes)
+    sim_length = int(config['sim_length'])
     # num_bots = int(config['init_bots'])
     # sim_length = int(config['sim_length'])
     # algo_name = config['algo_name']
+    df1 = pd.read_csv(sim_dir + '/{}_node.csv'.format(name))
     non_priority_nodes = [u for u in graph.nodes if u not in priority_nodes]
     node_x = []
     node_y = []
     node_x_priority= []
     node_y_priority= []
-    avg_idle = []
-    max_idle = []
     nodes = list(graph.nodes)
-    non_priority_nodes = [u for u in graph.nodes if u not in priority_nodes]
+    max_idle=[]
+    avg_idle=[]
+    avg_idle_pn=[]
+    max_idle_pn=[]
     # print(non_priority_nodes,priority_nodes)
     for node in graph.nodes():
         x, y = graph.nodes[node]['x'], graph.nodes[node]['y']
         if node in priority_nodes:
             node_x_priority.append(x)
             node_y_priority.append(y)
+            avg_idle.append(df1[node].mean())
+            max_idle.append(df1[node].max())
+            avg_idle_pn.append(df1[node].mean())
+            max_idle_pn.append(df1[node].max())
+
         else:
             node_x.append(x)
             node_y.append(y)
+            avg_idle.append(df1[node].mean())
+            max_idle.append(df1[node].max())
 
     d = 20 #radius of nodes
     edge_vis = {'cair': d/2, 'circle': d/2, 'grid_5_5': d/2, 'iitb': d, 'ladder': d/2, 'st_line': d, 'st_line_assym': d}
@@ -66,21 +77,23 @@ def main(param):
         edge_y.append(y0)
         edge_y.append(y1)
         edge_y.append(None)
-
-    df1 = pd.read_csv(sim_dir + '/{}_node.csv'.format(name))
+    
     idleness_over=[]
-    df4=df1
-    for n in df1.columns:
+    df4={}
+    # df4=df1
+    for n in nodes:
         print(n)
         # idleness_over.append(df1[n].value_counts()[1])
-        for i in df1[n]:
-            df4[n][i]=(max(i-80,0))
+        # for i in df1[n]:
+        df4[n] = df1[n]-float(time_period[0])
     # print(i)
-
+    df4=pd.DataFrame(df4)
+    df4[df4<0]=0
     df4.to_csv(sim_dir + '/{}_overshoot.csv'.format(name),index=False)
 
     for n in df4.columns:
-        idleness_over.append(df4[n].value_counts()[1])
+        idleness_over.append(df4[n].value_counts()[1]/df1[n].value_counts()[0])
+    # print(idleness_over)
 
     #plotting priority node locations
     def plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority):
@@ -239,7 +252,7 @@ def main(param):
                 #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
                 #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
                 #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
-                colorscale='Bluered',
+                colorscale='Blues',
                 reversescale=False,
                 color=idleness_over,
                 size=2 * d,
@@ -324,43 +337,58 @@ def main(param):
             fig.write_image('{}/{}_Overshoot_frequency.png'.format(sim_dir, name))
             del fig    
         
-    over = dict(zip(nodes,idleness_over))
-    non_p_over = []
-    pri_nod_over = []
-    for i in over.keys():
-        if i in priority_nodes:
-            pri_nod_over.append(over[i])
-        else:
-            non_p_over.append(over[i])
+    #Overshoot ratio,avg,max
+    df4[df4>0]=1
+    overshoot_ratio=[]
+    for n in priority_nodes:
+        overshoot_ratio.append(df4[n].sum()/sim_length)
+    
+    def write_csv():
+        df = pd.read_csv(dirname + '/'+"_".join(name_list[:-1])+'.csv')
+        to_add = {}
+        to_add = config.copy()
+        to_add['overshoot_avg'] = np.mean(overshoot_ratio)
+        to_add['overshoot_max'] = np.max(overshoot_ratio)
+        to_add['max_idle'] = np.max(max_idle)
+        to_add['avg_idle'] = np.mean(avg_idle)
+        to_add['max_idle_pn'] = np.max(max_idle_pn)
+        to_add['avg_idle_pn'] = np.mean(avg_idle_pn)
+        for col in to_add.keys():
+            if not col in df.columns:
+                df.reindex(columns = df.columns.tolist() + [col])
+        if to_add['random_string'] in map(str, df['random_string']):
+            df = df.append(to_add, ignore_index = True)
+            # df.loc[df['random_string'] == to_add['random_string']]
+        df.to_csv(dirname + '/'+"_".join(name_list[:-1])+'.csv', index = False)
+    # del df1, df4
 
-
-    priority_nodes=list(map(int,priority_nodes))
-    non_priority_nodes = list(map(int,non_priority_nodes))
-
-    #plotting temporal graph of overshoot
-    def temporal_freq():
+    def temporal_idle():
+        #scatter plot of idlness over
         plt.figure()
-        # sns.set_style('white')
-        # sns.set_context(font_scale= 1, rc = {"font.size" : 15, "axes.titlesize" : 20})
-        # plt.subplots(figsize = (20, 20))
+        sns.set_style('white')
+        sns.set_context(font_scale= 1, rc = {"font.size" : 15, "axes.titlesize" : 20})
         # plt.subplots(figsize = (10, 20))
         # plt.subplots_adjust(top= 0.2)
         # sns.set(rc = {'figure.figsize':(20, 100)})
-        # sns.relplot(data=non_p, kind='scatter')
-        # sns.relplot(data=pri_no, kind='scatter')
-        plt.scatter(non_priority_nodes,non_p_over,c="blue")
-        plt.scatter(priority_nodes,pri_nod_over,c="red")
-        plt.suptitle('Overshoot frequency vs nodes', size = 18, y = 1.02, x = 0.4)
+        for n in nodes:
+            if n in priority_nodes:
+                sns.scatterplot(data= df1.loc[::1000,n],color = 'red',alpha = 1)
+            else:
+                sns.scatterplot(data= df1.loc[::1000,n],color = 'blue',alpha = 0.2)
+
+        plt.suptitle('Node Idleness Values vs Time', size = 18, y = 1.02, x = 0.4)
+        sns.lineplot(data = df1.iloc[::1000], x = list(range(0,21000,1000)), y = df1.loc[::1000, nodes].mean(axis = 1), legend = False, linewidth = 3)
+        sns.lineplot(data = df1.iloc[::1000], x = list(range(0,21000,1000)), y = 80, legend = False, linewidth = 3, alpha  = 0.6)
         plt.xticks(rotation = 30)
         plt.ylabel('Node Idleness')
+        plt.xlabel("time in seconds")
 
-        plt.savefig('{}/{}_Overshoot.png'.format(sim_dir, name), bbox_inches = 'tight')
+        plt.savefig('{}/{}_temporal_idle.png'.format(sim_dir, name), bbox_inches='tight')
 
+    # idleness_spatial()
 
-    idleness_spatial()
-
-    plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority)
-
-    temporal_freq()
+    # plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority)
+    temporal_idle()
+    # temporal_idle()
 if __name__ == '__main__':
     main(sys.argv[1:])
