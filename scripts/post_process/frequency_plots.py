@@ -123,7 +123,7 @@ def main(param):
         priority = go.Scatter(
         x=node_x_priority, y=node_y_priority,
         mode='markers',
-        hoverinfo='text',
+        hoverinfo='text',df1=pd.read_csv
         marker=dict(
             showscale=False,
             # colorscale options
