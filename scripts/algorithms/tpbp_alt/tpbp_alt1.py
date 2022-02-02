@@ -20,14 +20,12 @@ import rospkg
 import networkx as nx
 import os
 import numpy 
-
 from mrpp_sumo.srv import NextTaskBot, NextTaskBotResponse
 from mrpp_sumo.srv import AlgoReady, AlgoReadyResponse
 from mrpp_sumo.msg import AtNode
 import time
 import random as rn
 import numpy as np
-
 
 def add_vertex_trail(graph, path, len_path, vertex, depth):
     cur = path[-1]
