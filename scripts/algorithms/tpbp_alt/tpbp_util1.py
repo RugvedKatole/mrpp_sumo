@@ -207,12 +207,13 @@ class TPBP:
             else:
                 #reward += self.graph.nodes[i]['idleness'] + n[t]
                 reward += n[t] - future_visit_final[i]
-            if i in self.priority_nodes:
-                # for j in self.graph.nodes[i]['future_visits'].values():
-                if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
-                    reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
-                else:
-                    reward += self.coefficients[1]*self.time_periods[0]
+                if i in self.priority_nodes:
+                    # for j in self.graph.nodes[i]['future_visits'].values():
+                    if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
+                        reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
+                    else:
+                        reward += self.coefficients[1]*self.time_periods[0]
+                future_visit_final[i]=n[t]
         return reward  
 
 
@@ -323,7 +324,7 @@ class TPBP:
 
     def callback_ready(self, req):
         algo_name = req.algo
-        if algo_name == 'tpbp_util' and self.ready:
+        if algo_name == 'tpbp_util1' and self.ready:
             return AlgoReadyResponse(True)
         else:
             return AlgoReadyResponse(False)

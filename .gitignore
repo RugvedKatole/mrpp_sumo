@@ -1,6 +1,6 @@
 outputs/*
 config/*
 !config/test.yaml
-# *.csv
+*.csv
 post_process/*
 *.png

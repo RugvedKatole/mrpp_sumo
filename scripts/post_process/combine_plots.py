@@ -30,31 +30,35 @@ def main(param):
     plt.suptitle('Node Idleness Values vs Time', size = 18, y = 1.02, x = 0.4)
     # for i in tpbp_df['random_string']:
     # for i in range(1,12,3):
-    algos=['tpbp_final','tpbp_util','tpbp_alt1','tpbp_util1']
-    fig,axes = plt.subplot(3,4,figsize=(20,20))
-    i=1
+    algos=['tpbp_final','tpbp_alt1','tpbp_util','tpbp_util1']
+    fig,axes = plt.subplots(3,4,figsize=(30,15))
+    i=0
     for j in range(4):
         for k in range(3):
             i += 1
             for a in algos:
+                
                 with open('{}/config/{}/{}.yaml'.format(dirname,a,a + "_" + str(i)), 'r') as f:
                     config = yaml.load(f, yaml.FullLoader)
                 graph = nx.read_graphml(dirname + '/graph_ml/{}.graphml'.format(config['graph']))
                 sim_dir = dirname + '/post_process/' + a + "_" + str(i)
                 nodes = list(graph.nodes())
                 df1 = pd.read_csv(sim_dir + '/{}_{}_node.csv'.format(a,str(i)))
-                sns.lineplot(ax=axes[k,j],data = df1.iloc[::1000], x = list(range(0,len(df1.loc[::1000])*1000,1000)), y = df1.loc[::1000, nodes].mean(axis = 1), legend = True, linewidth = 3)
-
-                # if i == config['random_string']:
-                    # if config['init_bots'] == 1:
-                        # num = config['random_string'].split("_")
-                        # df1 = pd.read_csv(sim_dir + '/{}_{}_node.csv'.format("_".join(name_list[:-1]),num[-1]))
-                        # sns.lineplot(data = df1.iloc[::1000], x = list(range(0,21000,1000)), y = df1.loc[::1000, nodes].mean(axis = 1), legend = False, linewidth = 3)
-            plt.title("{} robots and {} priority nodes".format(config['init_bots'],k+4))
+                priority_nodes = config['priority_nodes'].split(' ')
+                non_priority_nodes = [u for u in graph.nodes if u not in priority_nodes]
+                time_period = config['time_periods'].split(' ')
+                sns.lineplot(ax=axes[k,j],data = df1.iloc[::1000], x = list(range(0,len(df1.loc[::1000])*1000,1000)), y = df1.loc[::1000, nodes].mean(axis = 1), legend = True, linewidth = 3,alpha=0.4)
+                # sns.lineplot(ax=axes[k,j],data = df1.iloc[::1000], x = list(range(0,len(df1.loc[::1000])*1000,1000)), y = df1.loc[::1000, priority_nodes].mean(axis = 1), legend = True, linewidth = 3)
+            axes[k,j].set_title("{} robots and {} priority nodes".format(config['init_bots'],k+4))
+            axes[k,j].set_ylim(0,500)
+            # axes[k,j].set_xlim(0)
+            sns.lineplot(ax=axes[k,j],data = df1.iloc[::1000], x = list(range(0,len(df1.loc[::1000])*1000,1000)), y = float(time_period[0]), legend = True, linewidth = 3,alpha=0.4)
+            axes[k,j].legend(algos,prop={'size': 9})
+            # axes[k,j].set_xlabel('time in seconds')
             plt.xticks(rotation = 30)
             plt.ylabel('Node Idleness')
             plt.xlabel("time in seconds")
-    plt.savefig('{}/avg_idle_sample_1.png'.format(dirname), bbox_inches='tight')
+    plt.savefig('{}/avg_idle_ample_1.png'.format(dirname), bbox_inches='tight')
 
 
 
