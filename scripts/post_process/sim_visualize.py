@@ -42,13 +42,13 @@ def main(param):
     name_list =name.split('_')
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
-    shutil.copy('{}/config/tpbp_final/{}.yaml'.format(dirname,name ), sim_dir)
+    shutil.copy('{}/config/tpbp_util1/{}.yaml'.format(dirname,name), sim_dir)
     shutil.copy('{}/outputs/{}_visits.in'.format(dirname, "_".join(name_list[:-1]) + '_' + g + '_' + name_list[-1]), sim_dir)
     shutil.copy('{}/outputs/{}_command.in'.format(dirname, "_".join(name_list[:-1]) + '_' + g + '_' + name_list[-1]), sim_dir)
     # # shutil.copy('{}/outputs/{}_vehicle.xml'.format(dirdata, name), sim_dir)
     
     #get config and parameters
-    with open('{}/config/tpbp_final/{}.yaml'.format(dirname,name), 'r') as f:
+    with open('{}/config/tpbp_util1/{}.yaml'.format(dirname,name), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     # print(config)
 
