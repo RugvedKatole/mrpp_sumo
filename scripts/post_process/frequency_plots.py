@@ -22,7 +22,7 @@ def main(param):
     g = param[1]
     name_list =name.split('_')
     sim_dir = dirname + '/post_process/' + name
-    with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
+    with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     graph = nx.read_graphml(dirname + '/graph_ml/{}.graphml'.format(config['graph']))
     nodes = list(graph.nodes())

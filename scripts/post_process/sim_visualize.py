@@ -42,15 +42,16 @@ def main(param):
     name_list =name.split('_')
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
-    shutil.copy('{}/config/tpbp_util1/{}.yaml'.format(dirname,name), sim_dir)
-    shutil.copy('{}/outputs/{}_visits.in'.format(dirname, "_".join(name_list[:-1]) + '_' + g + '_' + name_list[-1]), sim_dir)
-    shutil.copy('{}/outputs/{}_command.in'.format(dirname, "_".join(name_list[:-1]) + '_' + g + '_' + name_list[-1]), sim_dir)
+    shutil.copy('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), sim_dir)
     # # shutil.copy('{}/outputs/{}_vehicle.xml'.format(dirdata, name), sim_dir)
     
     #get config and parameters
-    with open('{}/config/tpbp_util1/{}.yaml'.format(dirname,name), 'r') as f:
+    with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     # print(config)
+    random_string=config['random_string']
+    shutil.copy('{}/outputs/{}_visits.in'.format(dirname, random_string), sim_dir)
+    shutil.copy('{}/outputs/{}_command.in'.format(dirname, random_string), sim_dir)
 
     graph = nx.read_graphml(dirname + '/graph_ml/{}.graphml'.format(config['graph']))
     nodes = list(graph.nodes())
@@ -1132,9 +1133,10 @@ def main(param):
         df = df.append(to_add, ignore_index = True)
     df.to_csv(dirname + '/tpbp.csv', index = False)
     del df1, df2, df3, df
-
+    os.system('python3 {}/scripts/post_process/frequency_plots {} grid_5_5'.format(dirname, name))
 
 
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+    
