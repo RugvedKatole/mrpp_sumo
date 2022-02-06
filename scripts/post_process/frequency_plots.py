@@ -123,7 +123,7 @@ def main(param):
         priority = go.Scatter(
         x=node_x_priority, y=node_y_priority,
         mode='markers',
-        hoverinfo='text',df1=pd.read_csv
+        hoverinfo='text',
         marker=dict(
             showscale=False,
             # colorscale options
@@ -344,7 +344,7 @@ def main(param):
         overshoot_ratio.append(df4[n].sum()/sim_length)
     
     def write_csv():
-        df = pd.read_csv(dirname + '/'+"_".join(name_list[:-1])+'.csv')
+        df = pd.read_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])))
         to_add = {}
         to_add = config.copy()
         to_add['overshoot_avg'] = np.mean(overshoot_ratio)
@@ -356,10 +356,11 @@ def main(param):
         for col in to_add.keys():
             if not col in df.columns:
                 df.reindex(columns = df.columns.tolist() + [col])
-        if to_add['random_string'] in map(str, df['random_string']):
+        if not to_add['random_string'] in map(str, df['random_string']):
             df = df.append(to_add, ignore_index = True)
             # df.loc[df['random_string'] == to_add['random_string']]
-        df.to_csv(dirname + '/'+"_".join(name_list[:-1])+'.csv', index = False)
+        # print(df)
+        df.to_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])), index = False)
     # del df1, df4
 
     def temporal_idle():
@@ -377,18 +378,19 @@ def main(param):
                 sns.scatterplot(data= df1.loc[::1000,n],color = 'blue',alpha = 0.2)
 
         plt.suptitle('Node Idleness Values vs Time', size = 18, y = 1.02, x = 0.4)
-        sns.lineplot(data = df1.iloc[::1000], x = list(range(0,21000,1000)), y = df1.loc[::1000, nodes].mean(axis = 1), legend = False, linewidth = 3)
-        sns.lineplot(data = df1.iloc[::1000], x = list(range(0,21000,1000)), y = 80, legend = False, linewidth = 3, alpha  = 0.6)
+        sns.lineplot(data = df1.iloc[::1000], x = list(range(0,len(df1.iloc[::1000])*1000,1000)), y = df1.loc[::1000, nodes].mean(axis = 1), legend = False, linewidth = 3)
+        sns.lineplot(data = df1.iloc[::1000], x = list(range(0,len(df1.iloc[::1000])*1000,1000)), y = 80, legend = False, linewidth = 3, alpha  = 0.6)
         plt.xticks(rotation = 30)
         plt.ylabel('Node Idleness')
         plt.xlabel("time in seconds")
 
         plt.savefig('{}/{}_temporal_idle.png'.format(sim_dir, name), bbox_inches='tight')
 
-    # idleness_spatial()
+    idleness_spatial()
 
-    # plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority)
+    plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority)
     temporal_idle()
+    write_csv()
     # temporal_idle()
 if __name__ == '__main__':
     main(sys.argv[1:])
