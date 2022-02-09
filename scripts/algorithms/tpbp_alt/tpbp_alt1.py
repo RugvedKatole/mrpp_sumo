@@ -234,6 +234,7 @@ class TPBP:
                         if r > best_reward:
                             best_reward = r
                             next_walk = line2
+                            # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
         '''
         if all(self.assigned):
             print ('alive')
