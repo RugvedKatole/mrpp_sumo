@@ -342,7 +342,10 @@ def main(param):
     df4[df4>0]=1
     overshoot_ratio=[]
     for n in priority_nodes:
-        overshoot_ratio.append(df4[n].sum()/sim_length)
+        overshoot_ratio.append(df4[n].sum()/len(df4.index))
+    # print(df4)
+    time_period_violation_ratio = df4.max(axis=1).sum()/len(df4.index)
+    print(time_period_violation_ratio)
     
     def write_csv():
         # df = pd.read_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])))
@@ -355,6 +358,7 @@ def main(param):
         to_add['avg_idle'] = np.mean(avg_idle)
         to_add['max_idle_pn'] = np.max(max_idle_pn)
         to_add['avg_idle_pn'] = np.mean(avg_idle_pn)
+        to_add['time_period_violation_ration'] = time_period_violation_ratio
         for col in to_add.keys():
             if not col in df.columns:
                 df.reindex(columns = df.columns.tolist() + [col])
