@@ -30,7 +30,7 @@ import numpy as np
 def add_vertex_trail(graph, path, len_path, vertex, depth):
     cur = path[-1]
     len_rem = nx.dijkstra_path_length(graph, cur, vertex, weight = 'length')
-    if (len_rem + len_path)/100 > depth:
+    if len(path)-1 > depth:
         return False
     if not cur in path[:-1]:
         return True
