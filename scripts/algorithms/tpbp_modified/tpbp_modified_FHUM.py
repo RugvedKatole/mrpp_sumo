@@ -118,7 +118,7 @@ class TPBP:
         #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
         
         # Visit_counter
-        self.visit_counter = np.zeros(len(priority_nodes))
+        self.visit_counter = np.zeros(len(self.priority_nodes))
         
         self.N = len(self.nodes)
         self.assigned = []
@@ -201,12 +201,7 @@ class TPBP:
             # if not flag:
             else:
                 #reward += self.graph.nodes[i]['idleness'] + n[t]
-                reward += n[t] - future_visit_final[i]
-                if i in self.priority_nodes:
-                    # for j in self.graph.nodes[i]['future_visits'].values():
-                    if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
-                        reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
-                    else:
+                reward += n[t] - future_visit_fassigned
                         reward += self.coefficients[1]*self.time_periods[0]
                     future_visit_final[i]=n[t]
         return reward  
@@ -257,7 +252,7 @@ class TPBP:
         if node in self.priority_nodes:
             self.assigned[self.priority_nodes.index(node)] = False
 
-        print (node, self.priority_nodes, self.assigned)
+        print (node, self.priority_nodes, self.visit_counter)
 
         best_reward = -np.inf
         next_walk = []

@@ -132,6 +132,9 @@ class TPBP:
         #self.priority_nodes_prev = self.priority_nodes_cur[:]
         #self.reshuffle_next = np.random.poisson(self.reshuffle_time)
         #self.non_priority_nodes = [item for item in self.nodes if item not in self.priority_nodes]  #choosing dummy nodes other than current
+        
+        self.visit_counter = np.zeros(len(self.priority_nodes))
+        
         self.N = len(self.nodes)
         self.assigned = []
         #self.non_priority_assigned = []
@@ -267,29 +270,45 @@ class TPBP:
         if node in self.priority_nodes:
             self.assigned[self.priority_nodes.index(node)] = False
 
-        print (node, self.priority_nodes, self.assigned)
+        print (node, self.priority_nodes, self.visit_counter)
 
         best_reward = -np.inf
         next_walk = []
 
         self.graph.nodes[node]['idleness'] = 0.
 
-        for j in range(len(self.priority_nodes)):
+        #taking least visited node
+        list_min = np.where(self.visit_counter==np.amin(self.visit_counter))       #list min contains index values of least visited it is list in list
+        if len(list_min[0]) == 1:
+            j=list_min[0][0]
             if not self.assigned[j]:
-                valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
+                valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(int(self.time_periods[j])))
                 with open(self.offline_folder + valid_trails, 'r') as f:
                     count = 0
                     for line in f:
                         count += 1
                         line1 = line.split('\n')
                         line2 = line1[0].split(' ')
-                        line3 = nx.dijkstra_path(self.graph, line2[-1], self.priority_nodes[j], weight='length')
-                        if line2[-1] not in self.priority_nodes:
-                            line2.extend(line3[1:])
-                        r = self.utility(line2)
+                        r = self.tpbp_reward(line2)
                         if r > best_reward:
                             best_reward = r
                             next_walk = line2
+        else:
+            for j in list_min[0]:   
+                if not self.assigned[j]:
+                    valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(int(self.time_periods[j])))
+                    with open(self.offline_folder + valid_trails, 'r') as f:
+                        count = 0
+                        for line in f:
+                            count += 1
+                            line1 = line.split('\n')
+                            line2 = line1[0].split(' ')
+                            r = self.tpbp_reward(line2)
+                            if r > best_reward:
+                                best_reward = r
+                                next_walk = line2
+                            # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
+        self.visit_counter[self.priority_nodes.index(line2[-1])] += 1
         '''
         if all(self.assigned):
             print ('alive')
