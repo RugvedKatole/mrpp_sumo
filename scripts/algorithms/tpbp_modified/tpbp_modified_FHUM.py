@@ -201,7 +201,12 @@ class TPBP:
             # if not flag:
             else:
                 #reward += self.graph.nodes[i]['idleness'] + n[t]
-                reward += n[t] - future_visit_fassigned
+                reward += n[t] - future_visit_final[i]
+                if i in self.priority_nodes:
+                    # for j in self.graph.nodes[i]['future_visits'].values():
+                    if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
+                        reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
+                    else:
                         reward += self.coefficients[1]*self.time_periods[0]
                     future_visit_final[i]=n[t]
         return reward  
@@ -290,7 +295,7 @@ class TPBP:
                                 best_reward = r
                                 next_walk = line2
                             # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
-        self.visit_counter[self.priority_nodes.index(line2[-1])] += 1
+        self.visit_counter[self.priority_nodes.index(next_walk[-1])] += 1
         '''
         if all(self.assigned):
             print ('alive')

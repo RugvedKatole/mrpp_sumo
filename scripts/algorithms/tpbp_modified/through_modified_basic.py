@@ -255,7 +255,7 @@ class TPBP:
                                 best_reward = r
                                 next_walk = line2
                             # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
-        self.visit_counter[self.priority_nodes.index(line2[-1])] += 1
+        self.visit_counter[self.priority_nodes.index(next_walk[-1])] += 1
         '''
         if all(self.assigned):
             print ('alive')
