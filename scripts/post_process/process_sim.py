@@ -24,5 +24,6 @@ if __name__ == '__main__':
     post=['through_FHUM_3','through_FHUM_5']
     for i in post:
         main(i)
+    #using 6 cores for processing 
     # with Pool(6) as p:
         # p.map(main,post)
