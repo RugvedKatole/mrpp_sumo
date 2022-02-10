@@ -282,32 +282,37 @@ class TPBP:
         if len(list_min[0]) == 1:
             j=list_min[0][0]
             if not self.assigned[j]:
-                valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(int(self.time_periods[j])))
+                valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
                 with open(self.offline_folder + valid_trails, 'r') as f:
                     count = 0
                     for line in f:
                         count += 1
                         line1 = line.split('\n')
                         line2 = line1[0].split(' ')
-                        r = self.tpbp_reward(line2)
+                        line3 = nx.dijkstra_path(self.graph, line2[-1], self.priority_nodes[j], weight='length')
+                        if line2[-1] not in self.priority_nodes:
+                            line2.extend(line3[1:])
+                        r = self.utility(line2)
                         if r > best_reward:
                             best_reward = r
                             next_walk = line2
         else:
             for j in list_min[0]:   
                 if not self.assigned[j]:
-                    valid_trails = '/valid_trails_{}_{}_{}.in'.format(node, self.priority_nodes[j], str(int(self.time_periods[j])))
+                    valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
                     with open(self.offline_folder + valid_trails, 'r') as f:
                         count = 0
                         for line in f:
                             count += 1
                             line1 = line.split('\n')
                             line2 = line1[0].split(' ')
-                            r = self.tpbp_reward(line2)
+                            line3 = nx.dijkstra_path(self.graph, line2[-1], self.priority_nodes[j], weight='length')
+                            if line2[-1] not in self.priority_nodes:
+                                line2.extend(line3[1:])
+                            r = self.utility(line2)
                             if r > best_reward:
                                 best_reward = r
                                 next_walk = line2
-                            # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
         self.visit_counter[self.priority_nodes.index(next_walk[-1])] += 1
         '''
         if all(self.assigned):

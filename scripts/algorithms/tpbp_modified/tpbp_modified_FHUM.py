@@ -276,7 +276,7 @@ class TPBP:
                         count += 1
                         line1 = line.split('\n')
                         line2 = line1[0].split(' ')
-                        r = self.tpbp_reward(line2)
+                        r = self.utility(line2)
                         if r > best_reward:
                             best_reward = r
                             next_walk = line2
@@ -290,11 +290,10 @@ class TPBP:
                             count += 1
                             line1 = line.split('\n')
                             line2 = line1[0].split(' ')
-                            r = self.tpbp_reward(line2)
+                            r = self.utility(line2)
                             if r > best_reward:
                                 best_reward = r
                                 next_walk = line2
-                            # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
         self.visit_counter[self.priority_nodes.index(next_walk[-1])] += 1
         '''
         if all(self.assigned):
