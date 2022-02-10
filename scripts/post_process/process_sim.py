@@ -23,11 +23,7 @@ def main(string):
 if __name__ == '__main__':
     post=['tpbp_util1_1','tpbp_util1_3','tpbp_util1_5','tpbp_alt1_1','tpbp_alt1_3']
     for i in post:
-<<<<<<< HEAD
         main(i)
     #using 6 cores for processing 
     # with Pool(6) as p:
         # p.map(main,post)
-=======
-        main(i)
->>>>>>> d9a6f4557b8e164619583d23ebf2f2b9d563fce7
