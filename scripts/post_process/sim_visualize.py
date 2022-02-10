@@ -42,11 +42,13 @@ def main(param):
     name_list =name.split('_')
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
-    shutil.copy('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), sim_dir)
+    # shutil.copy('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), sim_dir)
+    shutil.copy('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), sim_dir)
     # # shutil.copy('{}/outputs/{}_vehicle.xml'.format(dirdata, name), sim_dir)
     
     #get config and parameters
-    with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
+    # with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
+    with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     # print(config)
     random_string=config['random_string']
@@ -81,6 +83,7 @@ def main(param):
         bot_visit_seq['bot_{}'.format(bot)] = pd.DataFrame(columns=['time', 'node']) 
 
 
+    # with open('{}/outputs/{}_visits.in'.format(dirname, "_".join(name_list[:-1]) + '_' + g+ '_' + name_list[-1]), 'r') as f:
     with open('{}/outputs/{}_visits.in'.format(dirname, random_string), 'r') as f:
         robots = {}
         i = 0

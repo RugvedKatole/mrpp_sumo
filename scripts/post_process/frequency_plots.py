@@ -22,7 +22,8 @@ def main(param):
     g = param[1]
     name_list =name.split('_')
     sim_dir = dirname + '/post_process/' + name
-    with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
+    # with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
+    with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
         config = yaml.load(f, yaml.FullLoader)
     graph = nx.read_graphml(dirname + '/graph_ml/{}.graphml'.format(config['graph']))
     nodes = list(graph.nodes())
@@ -344,7 +345,8 @@ def main(param):
         overshoot_ratio.append(df4[n].sum()/sim_length)
     
     def write_csv():
-        df = pd.read_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])))
+        # df = pd.read_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])))
+        df = pd.read_csv(dirname + '/'+"_".join(name_list[:-1])+'.csv')
         to_add = {}
         to_add = config.copy()
         to_add['overshoot_avg'] = np.mean(overshoot_ratio)
@@ -360,7 +362,8 @@ def main(param):
             df = df.append(to_add, ignore_index = True)
             # df.loc[df['random_string'] == to_add['random_string']]
         # print(df)
-        df.to_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])), index = False)
+        # df.to_csv(dirname + '/'+"_".join(name_list[:-2])+'_{}.csv'.format(str(config['depth'])), index = False)
+        df.to_csv(dirname + '/'+"_".join(name_list[:-1])+'.csv', index = False)
     # del df1, df4
 
     def temporal_idle():

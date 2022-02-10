@@ -198,8 +198,7 @@ class TPBP:
         if node in self.priority_nodes:
             self.assigned[self.priority_nodes.index(node)] = False
 
-        #print (node, self.priority_nodes, self.assigned)
-        print(self.count21)
+        print (node, self.priority_nodes, self.assigned)
 
         best_reward = -np.inf
         next_walk = []
@@ -219,8 +218,7 @@ class TPBP:
                         if r > best_reward:
                             best_reward = r
                             next_walk = line2
-        if next_walk[-1]=="21":
-            self.count21 +=1
+                            # self.assigned[self.priority_nodes.index(next_walk[-1])] = True
         '''
         if all(self.assigned):
             print ('alive')

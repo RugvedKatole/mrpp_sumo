@@ -84,7 +84,7 @@ def compute_valid_trails(g,graph, source, len_max, depth, folder):
                             if n not in path:
                                 add_path = nx.dijkstra_path(graph, line1[-2], n, weight='length')
                                 new_path += " " + ' '.join(add_path[1:])
-                                f.write(new_path+'\n')
+                                f.write(new_path+'\n'
                         
                 break
             os.remove(folder + '/vp_temp_{}.in'.format(steps-1))
@@ -329,13 +329,13 @@ class TPBP:
 
     def callback_ready(self, req):
         algo_name = req.algo
-        if algo_name == 'through_FHUM' and self.ready:
+        if algo_name == 'tpbp_util1' and self.ready:
             return AlgoReadyResponse(True)
         else:
             return AlgoReadyResponse(False)
 
 if __name__ == '__main__':
-    rospy.init_node('through_FHUM', anonymous = True)
+    rospy.init_node('tpbp_util', anonymous = True)
     dirname = rospkg.RosPack().get_path('mrpp_sumo')
     done = False
     graph_name = rospy.get_param('/graph')
