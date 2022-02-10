@@ -335,13 +335,13 @@ class TPBP:
 
     def callback_ready(self, req):
         algo_name = req.algo
-        if algo_name == 'tpbp_util' and self.ready:
+        if algo_name == 'tpbp_modified_FHUM' and self.ready:
             return AlgoReadyResponse(True)
         else:
             return AlgoReadyResponse(False)
 
 if __name__ == '__main__':
-    rospy.init_node('tpbp_util', anonymous = True)
+    rospy.init_node('tpbp_modified_FHUM', anonymous = True)
     dirname = rospkg.RosPack().get_path('mrpp_sumo')
     done = False
     graph_name = rospy.get_param('/graph')

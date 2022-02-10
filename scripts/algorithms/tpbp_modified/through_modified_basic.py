@@ -294,13 +294,13 @@ class TPBP:
 
     def callback_ready(self, req):
         algo_name = req.algo
-        if algo_name == 'through_basic' and self.ready:
+        if algo_name == 'through_modified_basic' and self.ready:
             return AlgoReadyResponse(True)
         else:
             return AlgoReadyResponse(False)
 
 if __name__ == '__main__':
-    rospy.init_node('through_basic', anonymous = True)
+    rospy.init_node('through_modified_basic', anonymous = True)
     dirname = rospkg.RosPack().get_path('mrpp_sumo')
     done = False
     graph_name = rospy.get_param('/graph')
