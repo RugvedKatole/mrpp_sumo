@@ -4,7 +4,7 @@ import os
 import rospkg
 import glob
 import sys
-
+from multiprocessing import Pool
 
 def main(string):
     dir_name = rospkg.RosPack().get_path('mrpp_sumo')
@@ -21,9 +21,9 @@ def main(string):
         print ('{} Done {}'.format(count, conf))
 
 if __name__ == '__main__':
-    post=['tpbp_util1_1','tpbp_util1_3','tpbp_util1_5','tpbp_alt1_1','tpbp_alt1_3']
-    for i in post:
-        main(i)
+    post=['through_modified_basic_1','through_modified_basic_3','through_modified_basic_5']
+    # for i in post:
+    #     main(i)
     #using 6 cores for processing 
-    # with Pool(6) as p:
-        # p.map(main,post)
+    with Pool(6) as p:
+        p.map(main,post)
