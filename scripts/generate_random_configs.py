@@ -13,7 +13,7 @@ if __name__ == '__main__':
         multiplicity = 3
         num_priority=[4,5,6]
         #alg_ids = [6, 7, 8, 9]
-        algo_name = ['tpbp_final','tpbp_alt1']
+        algo_name = ['through_modified_basic', "through_modified_FHUM"]
         vel = 10.
         coeff=" ".join(['1','10','0','0'])
         # prior_nodes = ['0', '4', '20', '24']
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         sim_length = 20000
         # discount_factors = [1]
         random_string  = 'tpbp'
-        i = 0
+        i = 36
         for _ in range(multiplicity):
             for ib in init_bots:            #number of bots 1,2,3,4
                 for g in graph_name:        # selectin a graph from 3 graphs
