@@ -37,10 +37,10 @@ def main(folder_name):
             list_doc['random_string'] = '{}_{}_{}_d{}'.format(list_doc['algo_name'],list_doc['graph'],i,list_doc['depth'])
             if not os.path.exists('{}/config/{}_{}'.format(dirname,list_doc['algo_name'],list_doc['depth'])):
                 os.mkdir('{}/config/{}_{}'.format(dirname,list_doc['algo_name'],list_doc['depth']))
-            with open('{}/config/{}_{}/{}_d{}_{}.yaml'.format(dirname,list_doc['algo_name'],list_doc['depth'],list_doc['algo_name'],list_doc['depth'],i), "w") as f:
+            with open('{}/config/{}_{}/{}_{}_{}.yaml'.format(dirname,list_doc['algo_name'],list_doc['depth'],list_doc['algo_name'],list_doc['depth'],i), "w") as f:
                 yaml.dump(list_doc, f)
 
 if __name__ == '__main__':
-    folders=['tpbp_final','tpbp_util']
+    folders=['through_FHUM_1']
     for i in folders:
         main(i)

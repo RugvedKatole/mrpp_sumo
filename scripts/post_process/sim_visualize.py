@@ -43,13 +43,16 @@ def main(param):
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
     # shutil.copy('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), sim_dir)
-    shutil.copy('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), sim_dir)
+    # shutil.copy('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), sim_dir)
     # # shutil.copy('{}/outputs/{}_vehicle.xml'.format(dirdata, name), sim_dir)
     
     #get config and parameters
-    # with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-1],name), 'r') as f:
-    with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
-        config = yaml.load(f, yaml.FullLoader)
+    if len(name_list)>4:
+        with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-2],name), 'r') as f:
+            config = yaml.load(f, yaml.FullLoader)
+    else:
+        with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
+            config = yaml.load(f, yaml.FullLoader)
     # print(config)
     random_string=config['random_string']
     shutil.copy('{}/outputs/{}_visits.in'.format(dirname, random_string), sim_dir)

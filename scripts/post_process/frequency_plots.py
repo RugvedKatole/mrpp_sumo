@@ -82,7 +82,7 @@ def main(param):
     idleness_over=[]
     df4={}
     # df4=df1
-    for n in nodes:
+    for n in priority_nodes:
         print(n)
         # idleness_over.append(df1[n].value_counts()[1])
         # for i in df1[n]:
