@@ -345,6 +345,7 @@ def main(param):
         overshoot_ratio.append(df4[n].sum()/len(df4.index))
     # print(df4)
     time_period_violation_ratio = df4.max(axis=1).sum()/len(df4.index)
+    average_time_period_ratio = df4.sum(axis=1).sum()/len(df4.index)
     print(time_period_violation_ratio)
     
     def write_csv():
@@ -359,6 +360,7 @@ def main(param):
         to_add['max_idle_pn'] = np.max(max_idle_pn)
         to_add['avg_idle_pn'] = np.mean(avg_idle_pn)
         to_add['time_period_violation_ration'] = time_period_violation_ratio
+        to_add['average_time_period_ratio'] = average_time_period_ratio
         for col in to_add.keys():
             if not col in df.columns:
                 df.reindex(columns = df.columns.tolist() + [col])
@@ -393,10 +395,10 @@ def main(param):
 
         plt.savefig('{}/{}_temporal_idle.png'.format(sim_dir, name), bbox_inches='tight')
 
-    idleness_spatial()
+    # idleness_spatial()
 
-    plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority)
-    temporal_idle()
+    # plot_priority_nodes(node_x,node_y,node_x_priority,node_y_priority)
+    # temporal_idle()
     write_csv()
     # temporal_idle()
 if __name__ == '__main__':
