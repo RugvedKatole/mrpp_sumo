@@ -8,7 +8,7 @@ import os
 if __name__ == '__main__':
     dir_name = rospkg.RosPack().get_path('mrpp_sumo')
     if len(sys.argv[1:]) == 0:
-        graph_name = ['grid_5_5']
+        graph_name = ['cair','iitb']
         #graph_name = ['st_line']
         multiplicity = 3
         num_priority=[4,5,6]
@@ -42,7 +42,7 @@ if __name__ == '__main__':
                         min_tp=(fn.compute_min_tp(graph,prior_nodes))/vel
                         for algo in algo_name:
                            
-                            with open(dir_name + '/config/' + algo + '/{}_{}.yaml'.format(algo, i), 'w') as f:
+                            with open(dir_name + '/config/' + algo + '_5/{}_5_{}.yaml'.format(algo, i), 'w') as f:
                                 f.write('use_sim_time: true\n')
                                 f.write('graph: {}\n'.format(g))
                                 f.write('init_bots: {}\n'.format(ib))
@@ -61,11 +61,11 @@ if __name__ == '__main__':
                             # f.write('max_bots: {}\n'.format(max_bots))
                             # f.write('random_string: {}{}\n'.format(random_string, i))
                                 #f.write('random_string: tpbp_{}\n'.format(i))
-                                f.write('random_string: {}_{}_{}\n'.format(algo,g,i))
+                                f.write('random_string: {}_{}_{}_d5\n'.format(algo,g,i))
                                 f.write('algo_name: {}\n'.format(algo))
                                 f.write('coefficients: {}\n'.format(coeff))
-                                if algo == 'tpbp_alt1':
-                                    f.write('depth: 5')
+                                # if algo == 'tpbp_alt1':
+                                f.write('depth: 5')
                         print (i)
     else:
         print ('Please pass the appropriate arguments')
