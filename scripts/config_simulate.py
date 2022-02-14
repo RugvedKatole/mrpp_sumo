@@ -8,10 +8,10 @@ import rosparam
 
 # missed = [175,169,163,157,151,115,109,103,55,49,43,37]
 dir_name = rospkg.RosPack().get_path('mrpp_sumo')
-algo=['tpbp_modified_basic_5','tpbp_modified_FHUM_5']
+algo=['through_modified_basic_5','through_modified_FHUM_5']
 count = 0
 for k in algo:
-    i=k.split('_')
+    # i=k.split('_')
     # for j in range(1,37):z
     config_files = glob.glob(dir_name + '/config/{}/*.yaml'.format(k))
     for conf in config_files:
