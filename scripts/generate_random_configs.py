@@ -8,7 +8,7 @@ import os
 if __name__ == '__main__':
     dir_name = rospkg.RosPack().get_path('mrpp_sumo')
     if len(sys.argv[1:]) == 0:
-        graph_name = ['cair','iitb']
+        graph_name = ['grid_5_5','cair','iitb']
         #graph_name = ['st_line']
         multiplicity = 3
         num_priority=[4,5,6]
@@ -30,19 +30,18 @@ if __name__ == '__main__':
         sim_length = 20000
         # discount_factors = [1]
         random_string  = 'tpbp'
-        i = 36
+        i = 0
         for _ in range(multiplicity):
-            for ib in init_bots:            #number of bots 1,2,3,4
-                for g in graph_name:        # selectin a graph from 3 graphs
-                    for a in num_priority:
-                        graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
+            for g in graph_name:        # selectin a graph from 3 graphs  ##1
+                graph = nx.read_graphml(dir_name + '/graph_ml/' + g + '.graphml')
+                for a in num_priority:      ##2
+                    prior_nodes = rn.sample(graph.nodes(), a)
+                    for ib in init_bots:            #number of bots 1,2,3,4 ## 3
                         i += 1
-                        prior_nodes = rn.sample(graph.nodes(), a)
                         loc=rn.sample(prior_nodes,ib)
                         min_tp=(fn.compute_min_tp(graph,prior_nodes))/vel
                         for algo in algo_name:
-                           
-                            with open(dir_name + '/config/' + algo + '_5/{}_5_{}.yaml'.format(algo, i), 'w') as f:
+                            with open(dir_name + '/config/' + algo + '_0_c_10/{}_0_c_10_{}.yaml'.format(algo, i), 'w') as f:
                                 f.write('use_sim_time: true\n')
                                 f.write('graph: {}\n'.format(g))
                                 f.write('init_bots: {}\n'.format(ib))
@@ -61,11 +60,11 @@ if __name__ == '__main__':
                             # f.write('max_bots: {}\n'.format(max_bots))
                             # f.write('random_string: {}{}\n'.format(random_string, i))
                                 #f.write('random_string: tpbp_{}\n'.format(i))
-                                f.write('random_string: {}_{}_{}_d5\n'.format(algo,g,i))
+                                f.write('random_string: {}_{}_{}_d0\n'.format(algo,g,i))
                                 f.write('algo_name: {}\n'.format(algo))
                                 f.write('coefficients: {}\n'.format(coeff))
                                 # if algo == 'tpbp_alt1':
-                                f.write('depth: 5')
+                                f.write('depth: 0')
                         print (i)
     else:
         print ('Please pass the appropriate arguments')
