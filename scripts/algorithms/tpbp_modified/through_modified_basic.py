@@ -160,7 +160,7 @@ class TPBP:
             if i in self.priority_nodes:
                 j = self.priority_nodes.index(i)    #returns index of i in list priority_nodes, i,j is node index pair
                 if not self.assigned[j]:
-                    temp2 += max(self.graph.nodes[i]['idleness'] - self.time_periods[j], 0)
+                    temp2 += max(self.graph.nodes[i]['idleness'], 0)
 
         temp3 = 0.
         '''
