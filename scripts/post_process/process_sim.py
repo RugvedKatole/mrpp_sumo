@@ -15,8 +15,8 @@ def main(string):
         path = conf.split('/')
         name = path[-1].split('.')[0]
         print ('Processing {}'.format(name))
-        os.system('python3 {}/scripts/post_process/sim_visualize.py {} grid_5_5'.format(dir_name, name))
-        os.system('python3 {}/scripts/post_process/frequency_plots.py {} grid_5_5'.format(dir_name, name))
+        os.system('python3 {}/scripts/post_process/sim_visualize.py {} '.format(dir_name, name))
+        # os.system('python3 {}/scripts/post_process/frequency_plots.py {} grid_5_5'.format(dir_name, name))
         count += 1
         print ('{} Done {}'.format(count, conf))
 

@@ -38,7 +38,7 @@ def main(param):
 
     #name of the yaml/output files
     name = param[0]
-    g = param[1]
+    # g = param[1]
     name_list =name.split('_')
     sim_dir = dirname + '/post_process/' + name
     os.mkdir(sim_dir)
@@ -48,7 +48,7 @@ def main(param):
     
     #get config and parameters
     if len(name_list)>4:
-        with open('{}/config/{}_{}/{}.yaml'.format(dirname,"_".join(name_list[:-2]),name_list[-2],name), 'r') as f:
+        with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
             config = yaml.load(f, yaml.FullLoader)
     else:
         with open('{}/config/{}/{}.yaml'.format(dirname,"_".join(name_list[:-1]),name), 'r') as f:
