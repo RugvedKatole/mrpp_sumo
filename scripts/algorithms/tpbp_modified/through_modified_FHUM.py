@@ -297,26 +297,28 @@ class TPBP:
                             best_reward = r
                             next_walk = line2
         else:
-            priority_idle = []
+            priority_idle = {}
             for n in list_min[0]:
-                priority_idle.append(self.graph.nodes[self.priority_nodes[n]]['idleness'])
-            list_max = np.where(priority_idle==np.amax(priority_idle))
-            j = list_max[0][0]  
-            if not self.assigned[j]:
-                valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
-                with open(self.offline_folder + valid_trails, 'r') as f:
-                    count = 0
-                    for line in f:
-                        count += 1
-                        line1 = line.split('\n')
-                        line2 = line1[0].split(' ')
-                        line3 = nx.dijkstra_path(self.graph, line2[-1], self.priority_nodes[j], weight='length')
-                        if line2[-1] not in self.priority_nodes:
-                            line2.extend(line3[1:])
-                        r = self.utility(line2)
-                        if r > best_reward:
-                            best_reward = r
-                            next_walk = line2
+                priority_idle[self.priority_nodes[n]] = self.graph.nodes[self.priority_nodes[n]]['idleness']
+            # list_max = np.where(priority_idle==np.amax(priority_idle))
+            # print(priority_idle)
+            P_idle_node = max(priority_idle,key=priority_idle.get)
+            # j = 0
+            # if not self.assigned[j]:
+            valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
+            with open(self.offline_folder + valid_trails, 'r') as f:
+                count = 0
+                for line in f:
+                    count += 1
+                    line1 = line.split('\n')
+                    line2 = line1[0].split(' ')
+                    line3 = nx.dijkstra_path(self.graph, line2[-1], P_idle_node, weight='length')
+                    if line2[-1] not in self.priority_nodes:
+                        line2.extend(line3[1:])
+                    r = self.utility(line2)
+                    if r > best_reward:
+                        best_reward = r
+                        next_walk = line2
         self.visit_counter[self.priority_nodes.index(next_walk[-1])] += 1
         '''
         if all(self.assigned):
