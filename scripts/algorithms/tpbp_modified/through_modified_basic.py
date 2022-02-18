@@ -245,8 +245,8 @@ class TPBP:
                                 next_walk = line2
         else:
             priority_idle = []
-            for n in self.priority_nodes:
-                priority_idle.append(self.graph.nodes[n]['idleness'])
+            for n in list_min[0]:
+                priority_idle.append(self.graph.nodes[self.priority_nodes[n]]['idleness'])
             list_max = np.where(priority_idle==np.amax(priority_idle))
             j = list_max[0][0]
             if not self.assigned[j]:
