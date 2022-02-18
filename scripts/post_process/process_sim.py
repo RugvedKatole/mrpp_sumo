@@ -21,7 +21,7 @@ def main(string):
         print ('{} Done {}'.format(count, conf))
 
 if __name__ == '__main__':
-    post=['through_modified_basic_1','through_modified_basic_3','through_modified_basic_5','through_modified_FHUM_5','through_modified_FHUM_3','through_modified_FHUM_1',]
+    post=['through_modified_FHUM_3_c_100', 'through_modified_FHUM_5_c_100']
     # for i in post:
     #     main(i)
     #using 6 cores for processing 

@@ -217,10 +217,10 @@ class TPBP:
                 reward += n[t] - future_visit_final[i]
                 if i in self.priority_nodes:
                     # for j in self.graph.nodes[i]['future_visits'].values():
-                    if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
-                        reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
-                    else:
-                        reward += self.coefficients[1]*self.time_periods[0]
+                    # if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
+                    reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
+                    # else:
+                        # reward += self.coefficients[1]*self.time_periods[0]
                 future_visit_final[i]=n[t]
         return reward  
 
