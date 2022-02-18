@@ -299,9 +299,9 @@ class TPBP:
         else:
             priority_idle = []
             for n in self.priority_nodes:
-                priority_idle.append(self.graph[n]['idleness'])
-            list_min = np.where(priority_idle==np.amin(priority_idle))
-            j = list_min[0][0]  
+                priority_idle.append(self.graph.nodes[n]['idleness'])
+            list_max = np.where(priority_idle==np.amax(priority_idle))
+            j = list_max[0][0]  
             if not self.assigned[j]:
                 valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
                 with open(self.offline_folder + valid_trails, 'r') as f:
@@ -371,7 +371,7 @@ if __name__ == '__main__':
     algo_name=rospy.get_param('/algo_name')
     priority_nodes = rospy.get_param('/priority_nodes').split(' ')
     time_periods = list(map(float, rospy.get_param('/time_periods').split(' ')))
-    coefficients = list(map(float, rospy.get_param('/coefficients').split(' ')))
+    coefficients = list(map(float, rospy.get_param('/coefficients').split(', ')))
     depth = rospy.get_param('/depth')
     #folder = rospy.get_param('/random_string')
     folder = algo_name + graph_name

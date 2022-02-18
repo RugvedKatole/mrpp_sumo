@@ -8,7 +8,7 @@ import rosparam
 
 # missed = [175,169,163,157,151,115,109,103,55,49,43,37]
 dir_name = rospkg.RosPack().get_path('mrpp_sumo')
-algo=['through_modified_basic_5','through_modified_FHUM_5']
+algo=['through_modified_FHUM_0_c_100','through_modified_FHUM_3_c_100','through_modified_FHUM_5_c_100','through_modified_basic_0_c_100','through_modified_basic_3_c_100','through_modified_basic_5_c_100']
 count = 0
 for k in algo:
     # i=k.split('_')
