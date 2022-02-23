@@ -217,10 +217,10 @@ class TPBP:
                 reward += n[t] - future_visit_final[i]
                 if i in self.priority_nodes:
                     # for j in self.graph.nodes[i]['future_visits'].values():
-                    if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
-                        reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
-                    else:
-                        reward += self.coefficients[1]*self.time_periods[0]
+                    # if n[t] - future_visit_final[i] < self.time_periods[0]:    #bit hard code here, j+ idleness is expected idlesness
+                    reward += (self.coefficients[1])*(n[t] - future_visit_final[i])
+                    # else:
+                        # reward += self.coefficients[1]*self.time_periods[0]
                 future_visit_final[i]=n[t]
         return reward  
 
@@ -297,26 +297,28 @@ class TPBP:
                             best_reward = r
                             next_walk = line2
         else:
-            priority_idle = []
-            for n in self.priority_nodes:
-                priority_idle.append(self.graph[n]['idleness'])
-            list_min = np.where(priority_idle==np.amin(priority_idle))
-            j = list_min[0][0]  
-            if not self.assigned[j]:
-                valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
-                with open(self.offline_folder + valid_trails, 'r') as f:
-                    count = 0
-                    for line in f:
-                        count += 1
-                        line1 = line.split('\n')
-                        line2 = line1[0].split(' ')
-                        line3 = nx.dijkstra_path(self.graph, line2[-1], self.priority_nodes[j], weight='length')
-                        if line2[-1] not in self.priority_nodes:
-                            line2.extend(line3[1:])
-                        r = self.utility(line2)
-                        if r > best_reward:
-                            best_reward = r
-                            next_walk = line2
+            priority_idle = {}
+            for n in list_min[0]:
+                priority_idle[self.priority_nodes[n]] = self.graph.nodes[self.priority_nodes[n]]['idleness']
+            # list_max = np.where(priority_idle==np.amax(priority_idle))
+            # print(priority_idle)
+            P_idle_node = max(priority_idle,key=priority_idle.get)
+            # j = 0
+            # if not self.assigned[j]:
+            valid_trails = '/depth_trails_{}_{}_{}.in'.format(self.graph_name, node, str(self.depth))
+            with open(self.offline_folder + valid_trails, 'r') as f:
+                count = 0
+                for line in f:
+                    count += 1
+                    line1 = line.split('\n')
+                    line2 = line1[0].split(' ')
+                    line3 = nx.dijkstra_path(self.graph, line2[-1], P_idle_node, weight='length')
+                    if line2[-1] not in self.priority_nodes:
+                        line2.extend(line3[1:])
+                    r = self.utility(line2)
+                    if r > best_reward:
+                        best_reward = r
+                        next_walk = line2
         self.visit_counter[self.priority_nodes.index(next_walk[-1])] += 1
         '''
         if all(self.assigned):
@@ -371,7 +373,7 @@ if __name__ == '__main__':
     algo_name=rospy.get_param('/algo_name')
     priority_nodes = rospy.get_param('/priority_nodes').split(' ')
     time_periods = list(map(float, rospy.get_param('/time_periods').split(' ')))
-    coefficients = list(map(float, rospy.get_param('/coefficients').split(' ')))
+    coefficients = list(map(float, rospy.get_param('/coefficients').split(', ')))
     depth = rospy.get_param('/depth')
     #folder = rospy.get_param('/random_string')
     folder = algo_name + graph_name

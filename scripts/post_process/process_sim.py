@@ -15,13 +15,13 @@ def main(string):
         path = conf.split('/')
         name = path[-1].split('.')[0]
         print ('Processing {}'.format(name))
-        os.system('python3 {}/scripts/post_process/sim_visualize.py {} grid_5_5'.format(dir_name, name))
-        os.system('python3 {}/scripts/post_process/frequency_plots.py {} grid_5_5'.format(dir_name, name))
+        os.system('python3 {}/scripts/post_process/sim_visualize.py {} '.format(dir_name, name))
+        # os.system('python3 {}/scripts/post_process/frequency_plots.py {} grid_5_5'.format(dir_name, name))
         count += 1
         print ('{} Done {}'.format(count, conf))
 
 if __name__ == '__main__':
-    post=['through_modified_basic_1','through_modified_basic_3','through_modified_basic_5','through_modified_FHUM_5','through_modified_FHUM_3','through_modified_FHUM_1',]
+    post=['through_modified_FHUM_3_c_100', 'through_modified_FHUM_5_c_100']
     # for i in post:
     #     main(i)
     #using 6 cores for processing 
