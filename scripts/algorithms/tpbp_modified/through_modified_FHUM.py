@@ -93,7 +93,6 @@ def compute_valid_trails(g,graph, source, len_max, depth, folder):
     #    os.remove(folder + '/vp_temp_{}.in'.format(i))
 
 def all_valid_trails(graph, node_set, len_max, depth, folder,g):
-    #suggestion using j in range(i+1,len(node_set)) might help reducing time complexity to n(n-1)/2, current time complexity is n^2
     for i in range(len(node_set)):
         compute_valid_trails(g, graph, node_set[i], len_max[i], depth, folder)
 
