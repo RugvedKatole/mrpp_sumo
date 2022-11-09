@@ -1,0 +1,11 @@
+algo_name: ppa_basic_0
+done: false
+graph: grid_5_5
+init_bots: 4
+init_locations: 2 12 24 15
+parameters: 10 0
+priority_nodes: 2 12 24 15
+random_string: ppa_basic_0_10_0_0
+sim_length: 20000
+use_sim_time: false
+

@@ -18,6 +18,7 @@ import plotly.io as pio
 
 
 def main(param):
+    '''hola amigo'''
     dirname = rospkg.RosPack().get_path('mrpp_sumo')
     name = param[0]
     g = param[1]
